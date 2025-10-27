@@ -52,9 +52,11 @@ export interface UserProfile {
 
 export async function getMe(): Promise<UserProfile> {
     try {
-        return await customFetch(true, `/auth/profile`, {
+        const result = await customFetch(true, `/auth/profile`, {
             method: "GET",
         });
+        localStorage.setItem("userProfile", JSON.stringify(result));
+        return result as UserProfile;
     } catch (err: any) {
         console.error("getProfile error:", err);
         throw err;

@@ -7,7 +7,7 @@ export interface EventFormBody {
     description: string;
     isActive: boolean;
     subscriptionExpiresAt: string;
-    expiresAt: string | null;
+    expiresAt: string;
     numberOfParticipants: number;
     categories: number[];
     participants: number[];
@@ -30,7 +30,7 @@ const EventModal: FC<EventModalProps> = ({
     const [description, setDescription] = useState("");
     const [isActive, setIsActive] = useState(true);
     const [subscriptionExpiresAt, setSubscriptionExpiresAt] = useState("");
-    const [expiresAt, setExpiresAt] = useState<string | null>(null);
+    const [expiresAt, setExpiresAt] = useState<string>("");
     const [numberOfParticipants, setNumberOfParticipants] = useState(0);
 
     const [categories, setCategories] = useState<number[]>([]);
@@ -58,7 +58,7 @@ const EventModal: FC<EventModalProps> = ({
         setDescription(initialData?.description || "");
         setIsActive(initialData?.isActive ?? true);
         setSubscriptionExpiresAt(initialData?.subscriptionExpiresAt?.slice(0, 10) || "");
-        setExpiresAt(initialData?.expiresAt?.slice(0, 10) || null);
+        setExpiresAt(initialData?.expiresAt?.slice(0, 10) || "");
         setNumberOfParticipants(initialData?.numberOfParticipants || 0);
         setCategories(initialData?.categories || []);
         setParticipants(initialData?.participants || []);
@@ -163,7 +163,7 @@ const EventModal: FC<EventModalProps> = ({
                 <input
                     type="date"
                     value={expiresAt ?? ""}
-                    onChange={e => setExpiresAt(e.target.value || null)}
+                    onChange={e => setExpiresAt(e.target.value)}
                     style={{
                         width: "100%",
                         marginBottom: "1rem",

@@ -10,6 +10,9 @@ function ProtectedRoute({ children, roleRequired }: { children: JSX.Element; rol
     const token = localStorage.getItem("token");
     const userProfile = localStorage.getItem("userProfile");
 
+    console.log(userProfile);
+
+
     if (!token) return <Navigate to="/" replace />;
 
     if (!userProfile) return <Navigate to="/" replace />;

@@ -15,7 +15,6 @@ export default function Login() {
 
             const user = await getMe();
             if (user?.roles![0].roleName === "GOD") {
-                console.log(user);
                 navigate("/admin-home");
             } else {
                 navigate("/home");
