@@ -1,64 +1,73 @@
 import { useEffect, useState } from "react";
 import {
-    type ApiEvent,
-    createEvent,
+    type ApiEvent, createEvent,
     deleteEvent,
     type EventFormBody,
     fetchEvents,
-    updateEvent,
-} from "../services/apiEvent.ts";
+    updateEvent
+} from "../services/apiEvent";
 import {
     type Category,
     createCategory,
     deleteCategory,
     fetchCategories,
-    updateCategory,
-} from "../services/category.ts";
-import CategoryModal from "../components/category.modal.tsx";
-import EventModal from "../components/event.modal.tsx";
-import {getMe} from "../services/auth.ts";
+    updateCategory
+} from "../services/category";
+import CategoryModal from "../components/category.modal";
+import EventModal from "../components/event.modal";
 
 export default function AdminHome() {
+
     const [activeTab, setActiveTab] = useState<"events" | "categories">("events");
     const [events, setEvents] = useState<ApiEvent[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-    const [editingEvent, setEditingEvent] = useState<ApiEvent | null>(null);
+
     const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+    const [editingEvent, setEditingEvent] = useState<ApiEvent | null>(null);
 
+    // ⬇️ Per toggle candidature evento
+    const [expandedEvents, setExpandedEvents] = useState<Record<number, boolean>>({});
 
-    const handleLogout = async () => {
-        localStorage.removeItem("token");
-        try {
-            await getMe();
-        } catch {
-            window.location.href = "/";
-        }
+    const toggleExpand = (eventId: number) => {
+        setExpandedEvents(prev => ({
+            ...prev,
+            [eventId]: !prev[eventId]
+        }));
     };
 
+
+    // ✅ Fetch eventi
     useEffect(() => {
-        if (activeTab === "events") {
-            setLoading(true);
-            fetchEvents()
-                .then((data) => setEvents(data.docs))
-                .catch((err) => setError(err.message))
-                .finally(() => setLoading(false));
-        }
+        if (activeTab !== "events") return;
+        setLoading(true);
+
+        fetchEvents()
+            .then(data => setEvents(data.docs))
+            .catch(err => setError(err.message))
+            .finally(() => setLoading(false));
+
     }, [activeTab]);
 
+
+    // ✅ Fetch categorie
     useEffect(() => {
-        if (activeTab === "categories") {
-            setLoading(true);
-            fetchCategories()
-                .then((data) => setCategories(data.docs))
-                .catch((err) => setError(err.message))
-                .finally(() => setLoading(false));
-        }
+        if (activeTab !== "categories") return;
+        setLoading(true);
+
+        fetchCategories()
+            .then(data => setCategories(data.docs))
+            .catch(err => setError(err.message))
+            .finally(() => setLoading(false));
+
     }, [activeTab]);
 
+
+    // ✅ Submit Categoria (create/update)
     const handleSubmitCategory = async (name: string, description: string) => {
         try {
             if (editingCategory) {
@@ -69,205 +78,272 @@ export default function AdminHome() {
 
             setIsCategoryModalOpen(false);
             setEditingCategory(null);
+
             setLoading(true);
-            fetchCategories()
-                .then((data) => setCategories(data.docs))
-                .catch((err) => setError(err.message))
-                .finally(() => setLoading(false));
+            fetchCategories().then(data => setCategories(data.docs)).finally(() => setLoading(false));
+
         } catch (err: any) {
             alert("Errore: " + err.message);
         }
     };
 
+    // ✅ Submit Evento (create/update)
     const handleSubmitEvent = async (data: EventFormBody) => {
         try {
-            if (editingEvent) {
-                await updateEvent(editingEvent.id, data);
-            } else {
-                await createEvent(data);
-            }
+            if (editingEvent) await updateEvent(editingEvent.id, data);
+            else await createEvent(data);
 
             setIsEventModalOpen(false);
             setEditingEvent(null);
+
             setLoading(true);
-            fetchEvents()
-                .then((d) => setEvents(d.docs))
-                .catch((err) => setError(err.message))
-                .finally(() => setLoading(false));
+            fetchEvents().then(data => setEvents(data.docs)).finally(() => setLoading(false));
+
         } catch (err: any) {
             alert("Errore: " + err.message);
         }
+    };
+
+
+    // ✅ Logout
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        window.location.href = "/";
     };
 
 
     const renderEventsTab = () => {
-        if (loading) return <p style={{ textAlign: "center", marginTop: "2rem" }}>Caricamento eventi...</p>;
-        if (error) return <p style={{ color: "red", textAlign: "center", marginTop: "2rem" }}>Errore: {error}</p>;
+        if (loading) return <p style={{ textAlign: "center" }}>Caricamento eventi...</p>;
+        if (error) return <p style={{ textAlign: "center", color: "red" }}>Errore: {error}</p>;
 
         return (
             <>
-                <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
                     <button
                         style={{
-                            backgroundColor: "#daa520",
-                            color: "#2f4f4f",
-                            padding: "0.5rem 1rem",
-                            border: "none",
-                            borderRadius: "0.5rem",
-                            fontWeight: "bold",
-                            cursor: "pointer",
-                            marginBottom: "1rem",
+                            backgroundColor: "#daa520", color: "#2f4f4f",
+                            padding: "0.5rem 1rem", border: "none",
+                            borderRadius: "0.5rem", cursor: "pointer",
+                            fontWeight: "bold"
                         }}
-                        onClick={() => {
-                            setEditingEvent(null);
-                            setIsEventModalOpen(true);
-                        }}
+                        onClick={() => { setEditingEvent(null); setIsEventModalOpen(true); }}
                     >
                         Crea nuovo evento
                     </button>
                 </div>
+
                 <ul style={{ listStyle: "none", padding: 0 }}>
-                    {events.map((event) => (
-                        <li
-                            key={event.id}
-                            style={{
+                    {events.map(event => {
+                        const expanded = expandedEvents[event.id] || false;
+
+                        const max = event.numberOfParticipants || 1;
+                        const current = event.participants?.length ?? 0;
+                        const progress = Math.min((current / max) * 100, 100);
+
+                        const deadline = new Date(event.subscriptionExpiresAt).toLocaleDateString("it-IT");
+                        const awardDate = event.expiresAt
+                            ? new Date(event.expiresAt).toLocaleDateString("it-IT")
+                            : "N/D";
+
+                        return (
+                            <li key={event.id} style={{
                                 backgroundColor: "#f5f9f0",
                                 border: "2px solid #daa520",
                                 borderRadius: "0.5rem",
                                 padding: "1rem",
-                                marginBottom: "1rem",
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                            }}
-                        >
-                            <div>
-                                <strong style={{ color: "#2f4f4f", fontSize: "1.1rem" }}>{event.name}</strong>
-                                <p style={{ color: "#2f4f4f", margin: "0.25rem 0" }}>{event.description}</p>
-                                <p style={{ color: "#2f4f4f", fontSize: "0.85rem" }}>
-                                    Partecipanti: {event.numberOfParticipants} | Attivo: {event.isActive ? "Sì" : "No"}
-                                </p>
-                            </div>
-                            <div style={{ display: "flex", gap: "0.5rem" }}>
-                                <button
-                                    style={{
-                                        backgroundColor: "#2f4f4f",
-                                        color: "#daa520",
-                                        padding: "0.4rem 0.7rem",
-                                        borderRadius: "0.5rem",
-                                        border: "none",
-                                        cursor: "pointer",
-                                        fontWeight: "bold",
-                                    }}
-                                    onClick={() => {
-                                        setEditingEvent(event);
-                                        setIsEventModalOpen(true);
-                                    }}
-                                >
-                                    Modifica
-                                </button>
-                                <button
-                                    style={{
-                                        backgroundColor: "#ff4d4f",
-                                        color: "#fff",
-                                        padding: "0.4rem 0.7rem",
-                                        borderRadius: "0.5rem",
-                                        border: "none",
-                                        cursor: "pointer",
-                                        fontWeight: "bold",
-                                    }}
-                                    onClick={async () => {
-                                        if (!confirm(`Sei sicuro di voler eliminare l'evento ${event.name}?`)) return;
+                                marginBottom: "1rem"
+                            }}>
+                                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <div style={{ flex: 1 }}>
+                                        <strong style={{ color: "#2f4f4f", fontSize: "1.1rem" }}>{event.name}</strong>
+                                        <p style={{ margin: "0.25rem 0", color: "#2f4f4f" }}>{event.description}</p>
 
-                                        try {
-                                            await deleteEvent(event.id);
-                                            setLoading(true);
-                                            fetchEvents()
-                                                .then((data) => setEvents(data.docs))
-                                                .catch((err) => setError(err.message))
-                                                .finally(() => setLoading(false));
-                                        } catch (err: any) {
-                                            alert("Errore durante l'eliminazione: " + err.message);
-                                        }
+                                        {/* ✅ Categorie */}
+                                        <div style={{ marginBottom: "0.5rem" }}>
+                                            {event.categories.map(cat => (
+                                                <span key={cat.id} style={{
+                                                    backgroundColor: "#daa520",
+                                                    color: "#2f4f4f",
+                                                    padding: "0.25rem 0.7rem",
+                                                    borderRadius: "0.5rem",
+                                                    marginRight: "0.3rem",
+                                                    fontSize: "0.75rem",
+                                                    fontWeight: "bold"
+                                                }}>
+                                                    {cat.name.toUpperCase()}
+                                                </span>
+                                            ))}
+                                        </div>
+
+                                        {/* ✅ Barra progressiva */}
+                                        <div style={{
+                                            backgroundColor: "#d3e6c5",
+                                            height: "10px", width: "100%",
+                                            borderRadius: "0.5rem", overflow: "hidden"
+                                        }}>
+                                            <div style={{
+                                                height: "100%", width: `${progress}%`,
+                                                backgroundColor: progress >= 100 ? "#daa520" : "#2f4f4f",
+                                                transition: "width .3s"
+                                            }} />
+                                        </div>
+
+                                        <p style={{ fontSize: "0.85rem", margin: "0.25rem 0", color: "#2f4f4f" }}>
+                                            {current}/{max} partecipanti iscritti
+                                        </p>
+
+                                        {/* ✅ Date */}
+                                        <p style={{ margin: 0, fontSize: "0.85rem", color: "#2f4f4f" }}>
+                                            Scadenza candidature: <b>{deadline}</b>
+                                        </p>
+                                        <p style={{ fontSize: "0.85rem", color: "#2f4f4f" }}>
+                                            Data premiazione: <b>{awardDate}</b>
+                                        </p>
+                                    </div>
+
+                                    {/* ✅ Pulsanti */}
+                                    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginLeft: "1rem" }}>
+                                        <button
+                                            style={{
+                                                backgroundColor: "#2f4f4f", color: "#daa520",
+                                                padding: ".4rem .7rem", borderRadius: ".5rem",
+                                                border: "none", cursor: "pointer", fontWeight: "bold"
+                                            }}
+                                            onClick={() => { setEditingEvent(event); setIsEventModalOpen(true); }}
+                                        >
+                                            Modifica
+                                        </button>
+                                        <button
+                                            style={{
+                                                backgroundColor: "#ff4d4f", color: "#fff",
+                                                padding: ".4rem .7rem", borderRadius: ".5rem",
+                                                border: "none", cursor: "pointer", fontWeight: "bold"
+                                            }}
+                                            onClick={async () => {
+                                                if (!confirm(`Eliminare '${event.name}'?`)) return;
+                                                await deleteEvent(event.id);
+                                                setLoading(true);
+                                                fetchEvents().then(d => setEvents(d.docs)).finally(() => setLoading(false));
+                                            }}
+                                        >
+                                            Elimina
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* ✅ Espandi candidature */}
+                                <button
+                                    style={{
+                                        marginTop: "1rem",
+                                        backgroundColor: "#daa520", color: "#2f4f4f",
+                                        padding: ".4rem .7rem", border: "none",
+                                        borderRadius: ".5rem", cursor: "pointer",
+                                        fontWeight: "bold"
                                     }}
+                                    onClick={() => toggleExpand(event.id)}
                                 >
-                                    Elimina
+                                    {expanded ? "Nascondi candidature ⬆️" : "Mostra candidature ⬇️"}
                                 </button>
-                            </div>
-                        </li>
-                    ))}
+
+                                {expanded &&
+                                    <div style={{ marginTop: ".7rem" }}>
+                                        {event.subscriptions.length === 0 ? (
+                                            <p style={{ fontSize: ".85rem" }}>Nessuna candidatura registrata.</p>
+                                        ) : (
+                                            event.subscriptions.map(sub => (
+                                                <div key={sub.id} style={{
+                                                    backgroundColor: "#fff",
+                                                    border: "1px solid #2f4f4f",
+                                                    borderRadius: "0.5rem",
+                                                    padding: ".6rem",
+                                                    marginBottom: ".5rem",
+                                                    display: "flex",
+                                                    justifyContent: "space-between"
+                                                }}>
+                                                    <span style={{ color: "#2f4f4f" }}>🎬 {sub.movieName}</span>
+
+                                                    <button
+                                                        style={{
+                                                            backgroundColor: "#ff4d4f", color: "#fff",
+                                                            padding: ".3rem .6rem",
+                                                            borderRadius: ".4rem",
+                                                            border: "none",
+                                                            cursor: "pointer",
+                                                            fontWeight: "bold",
+                                                            fontSize: ".75rem"
+                                                        }}
+                                                        onClick={() => alert("TODO invalida")}
+                                                    >
+                                                        Invalida
+                                                    </button>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                }
+                            </li>
+                        );
+                    })}
                 </ul>
+
                 <EventModal
                     isOpen={isEventModalOpen}
-                    onClose={() => {
-                        setIsEventModalOpen(false);
-                        setEditingEvent(null);
-                    }}
+                    onClose={() => { setIsEventModalOpen(false); setEditingEvent(null); }}
                     onSubmit={handleSubmitEvent}
-                    initialData={
-                        editingEvent
-                            ? {
-                                name: editingEvent.name,
-                                description: editingEvent.description,
-                                isActive: editingEvent.isActive,
-                                subscriptionExpiresAt: editingEvent.subscriptionExpiresAt,
-                                numberOfParticipants: editingEvent.numberOfParticipants,
-                            }
-                            : undefined
-                    }
+                    initialData={editingEvent ? {
+                        name: editingEvent.name,
+                        description: editingEvent.description,
+                        isActive: editingEvent.isActive,
+                        subscriptionExpiresAt: editingEvent.subscriptionExpiresAt,
+                        numberOfParticipants: editingEvent.numberOfParticipants,
+                        categories: editingEvent.categories?.map(c => c.id) || [],
+                        participants: editingEvent.participants?.map(p => p.id) || [],
+                        expiresAt: editingEvent.expiresAt?.length ? editingEvent.expiresAt : null,
+                    } : undefined}
                 />
             </>
         );
     };
 
+
     const renderCategoriesTab = () => (
         <>
-            <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+            <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
                 <button
                     style={{
-                        backgroundColor: "#daa520",
-                        color: "#2f4f4f",
-                        padding: "0.5rem 1rem",
-                        border: "none",
-                        borderRadius: "0.5rem",
-                        fontWeight: "bold",
-                        cursor: "pointer",
-                        marginBottom: "1rem",
+                        backgroundColor: "#daa520", color: "#2f4f4f",
+                        padding: "0.5rem 1rem", borderRadius: "0.5rem",
+                        border: "none", cursor: "pointer", fontWeight: "bold"
                     }}
-                    onClick={() => setIsCategoryModalOpen(true)}
+                    onClick={() => { setEditingCategory(null); setIsCategoryModalOpen(true); }}
                 >
                     Crea nuova categoria
                 </button>
             </div>
+
             <ul style={{ listStyle: "none", padding: 0 }}>
-                {categories.map((category) => (
-                    <li
-                        key={category.id}
-                        style={{
-                            backgroundColor: "#f5f9f0",
-                            border: "2px solid #daa520",
-                            borderRadius: "0.5rem",
-                            padding: "1rem",
-                            marginBottom: "1rem",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                        }}
-                    >
+                {categories.map(category => (
+                    <li key={category.id} style={{
+                        backgroundColor: "#f5f9f0",
+                        border: "2px solid #daa520",
+                        borderRadius: "0.5rem",
+                        padding: "1rem",
+                        marginBottom: "1rem",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center"
+                    }}>
                         <div>
-                            <strong style={{ color: "#2f4f4f", fontSize: "1.1rem" }}>{category.name}</strong>
-                            <p style={{ color: "#2f4f4f", margin: "0.25rem 0" }}>{category.description}</p>
+                            <strong style={{ color: "#2f4f4f" }}>{category.name}</strong>
+                            <p style={{ fontSize: ".85rem", color: "#2f4f4f" }}>{category.description}</p>
                         </div>
-                        <div style={{ display: "flex", gap: "0.5rem" }}>
+
+                        <div style={{ display: "flex", gap: ".5rem" }}>
                             <button
                                 style={{
-                                    backgroundColor: "#2f4f4f",
-                                    color: "#daa520",
-                                    padding: "0.4rem 0.7rem",
-                                    borderRadius: "0.5rem",
-                                    border: "none",
-                                    cursor: "pointer",
-                                    fontWeight: "bold",
+                                    backgroundColor: "#2f4f4f", color: "#daa520",
+                                    padding: ".4rem .7rem", borderRadius: ".5rem",
+                                    cursor: "pointer", fontWeight: "bold"
                                 }}
                                 onClick={() => {
                                     setEditingCategory(category);
@@ -276,28 +352,18 @@ export default function AdminHome() {
                             >
                                 Modifica
                             </button>
+
                             <button
                                 style={{
-                                    backgroundColor: "#ff4d4f",
-                                    color: "#fff",
-                                    padding: "0.4rem 0.7rem",
-                                    borderRadius: "0.5rem",
-                                    border: "none",
-                                    cursor: "pointer",
-                                    fontWeight: "bold",
+                                    backgroundColor: "#ff4d4f", color: "#fff",
+                                    padding: ".4rem .7rem", borderRadius: ".5rem",
+                                    cursor: "pointer", fontWeight: "bold"
                                 }}
                                 onClick={async () => {
-                                    if (!confirm(`Sei sicuro di voler eliminare la categoria ${category.name}?`)) return;
-                                    try {
-                                        await deleteCategory(category.id);
-                                        setLoading(true);
-                                        fetchCategories()
-                                            .then((data) => setCategories(data.docs))
-                                            .catch((err) => setError(err.message))
-                                            .finally(() => setLoading(false));
-                                    } catch (err: any) {
-                                        alert("Errore durante l'eliminazione: " + err.message);
-                                    }
+                                    if (!confirm(`Eliminare '${category.name}'?`)) return;
+                                    await deleteCategory(category.id);
+                                    setLoading(true);
+                                    fetchCategories().then(d => setCategories(d.docs)).finally(() => setLoading(false));
                                 }}
                             >
                                 Elimina
@@ -306,12 +372,10 @@ export default function AdminHome() {
                     </li>
                 ))}
             </ul>
+
             <CategoryModal
                 isOpen={isCategoryModalOpen}
-                onClose={() => {
-                    setIsCategoryModalOpen(false);
-                    setEditingCategory(null);
-                }}
+                onClose={() => { setIsCategoryModalOpen(false); setEditingCategory(null); }}
                 onSubmit={handleSubmitCategory}
                 initialName={editingCategory?.name}
                 initialDescription={editingCategory?.description}
@@ -319,39 +383,34 @@ export default function AdminHome() {
         </>
     );
 
+
     return (
         <div style={{ padding: "2rem", backgroundColor: "#d0f0c0", minHeight: "100vh", position: "relative" }}>
-            {/* 🔹 Bottone logout */}
+
+            {/* ✅ Logout */}
             <button
                 onClick={handleLogout}
                 style={{
-                    position: "absolute",
-                    top: "1.5rem",
-                    right: "2rem",
-                    backgroundColor: "#2f4f4f",
-                    color: "#daa520",
-                    padding: "0.5rem 1rem",
-                    borderRadius: "0.5rem",
-                    border: "none",
-                    cursor: "pointer",
-                    fontWeight: "bold",
+                    position: "absolute", top: "1.5rem", right: "2rem",
+                    backgroundColor: "#2f4f4f", color: "#daa520",
+                    padding: "0.5rem 1rem", border: "none",
+                    borderRadius: "0.5rem", cursor: "pointer",
+                    fontWeight: "bold"
                 }}
             >
                 Logout
             </button>
 
-            <h1 style={{ color: "#daa520", textAlign: "center", marginBottom: "2rem" }}>Admin Dashboard</h1>
+            <h1 style={{ textAlign: "center", color: "#daa520" }}>Admin Dashboard</h1>
 
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem", gap: "1rem" }}>
+            {/* ✅ Tabs */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "2rem", gap: "1rem" }}>
                 <button
                     style={{
                         backgroundColor: activeTab === "events" ? "#daa520" : "#f5f9f0",
-                        color: "#2f4f4f",
-                        padding: "0.5rem 1rem",
-                        borderRadius: "0.5rem",
-                        border: "2px solid #daa520",
-                        fontWeight: "bold",
-                        cursor: "pointer",
+                        color: "#2f4f4f", border: "2px solid #daa520",
+                        padding: ".5rem 1rem", borderRadius: ".5rem",
+                        cursor: "pointer", fontWeight: "bold"
                     }}
                     onClick={() => setActiveTab("events")}
                 >
@@ -360,12 +419,9 @@ export default function AdminHome() {
                 <button
                     style={{
                         backgroundColor: activeTab === "categories" ? "#daa520" : "#f5f9f0",
-                        color: "#2f4f4f",
-                        padding: "0.5rem 1rem",
-                        borderRadius: "0.5rem",
-                        border: "2px solid #daa520",
-                        fontWeight: "bold",
-                        cursor: "pointer",
+                        color: "#2f4f4f", border: "2px solid #daa520",
+                        padding: ".5rem 1rem", borderRadius: ".5rem",
+                        cursor: "pointer", fontWeight: "bold"
                     }}
                     onClick={() => setActiveTab("categories")}
                 >
@@ -373,7 +429,7 @@ export default function AdminHome() {
                 </button>
             </div>
 
-            <div>{activeTab === "events" ? renderEventsTab() : renderCategoriesTab()}</div>
+            {activeTab === "events" ? renderEventsTab() : renderCategoriesTab()}
         </div>
     );
 }

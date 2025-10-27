@@ -1,11 +1,16 @@
-import {type FC, useEffect, useState } from "react";
+import { type FC, useEffect, useState, useRef } from "react";
+import { fetchCategories, type Category } from "../services/category";
+import { fetchUsers, type User } from "../services/user";
 
 export interface EventFormBody {
     name: string;
     description: string;
     isActive: boolean;
-    subscriptionExpiresAt: string | null;
+    subscriptionExpiresAt: string;
+    expiresAt: string | null;
     numberOfParticipants: number;
+    categories: number[];
+    participants: number[];
 }
 
 interface EventModalProps {
@@ -15,153 +20,341 @@ interface EventModalProps {
     initialData?: EventFormBody;
 }
 
-const EventModal: FC<EventModalProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
-    const [name, setName] = useState(initialData?.name || "");
-    const [description, setDescription] = useState(initialData?.description || "");
-    const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
-    const [subscriptionExpiresAt, setSubscriptionExpiresAt] = useState(initialData?.subscriptionExpiresAt || "");
-    const [numberOfParticipants, setNumberOfParticipants] = useState(initialData?.numberOfParticipants || 0);
+const EventModal: FC<EventModalProps> = ({
+                                             isOpen,
+                                             onClose,
+                                             onSubmit,
+                                             initialData
+                                         }) => {
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [isActive, setIsActive] = useState(true);
+    const [subscriptionExpiresAt, setSubscriptionExpiresAt] = useState("");
+    const [expiresAt, setExpiresAt] = useState<string | null>(null);
+    const [numberOfParticipants, setNumberOfParticipants] = useState(0);
+
+    const [categories, setCategories] = useState<number[]>([]);
+    const [participants, setParticipants] = useState<number[]>([]);
+
+    const [allCategories, setAllCategories] = useState<Category[]>([]);
+    const [allUsers, setAllUsers] = useState<User[]>([]);
+
+    const [openCategories, setOpenCategories] = useState(false);
+    const [openParticipants, setOpenParticipants] = useState(false);
+
+    const catRef = useRef<HTMLDivElement>(null);
+    const partRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        if (!isOpen) return;
+
+        fetchCategories().then(r => setAllCategories(r.docs));
+        fetchUsers({
+            query: { value: "", roles: [] },
+            options: { limit: 200, page: 1, sort: [], populate: "" }
+        }).then(r => setAllUsers(r));
+
         setName(initialData?.name || "");
         setDescription(initialData?.description || "");
         setIsActive(initialData?.isActive ?? true);
-        setSubscriptionExpiresAt(initialData?.subscriptionExpiresAt || "");
+        setSubscriptionExpiresAt(initialData?.subscriptionExpiresAt?.slice(0, 10) || "");
+        setExpiresAt(initialData?.expiresAt?.slice(0, 10) || null);
         setNumberOfParticipants(initialData?.numberOfParticipants || 0);
+        setCategories(initialData?.categories || []);
+        setParticipants(initialData?.participants || []);
     }, [initialData, isOpen]);
 
+    // 🔹 Chiudi dropdown cliccando fuori
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (catRef.current && !catRef.current.contains(e.target as Node)) {
+                setOpenCategories(false);
+            }
+            if (partRef.current && !partRef.current.contains(e.target as Node)) {
+                setOpenParticipants(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     if (!isOpen) return null;
+
+    const toggleValue = (arr: number[], id: number) =>
+        arr.includes(id) ? arr.filter(x => x !== id) : [...arr, id];
 
     return (
         <div
             style={{
                 position: "fixed",
-                top: 0, left: 0,
-                width: "100%", height: "100%",
-                backgroundColor: "rgba(0,0,0,0.5)",
+                inset: 0,
+                background: "rgba(0,0,0,0.5)",
                 display: "flex",
-                alignItems: "center",
                 justifyContent: "center",
-                zIndex: 1000
+                alignItems: "center",
+                zIndex: 1000,
             }}
         >
             <div
                 style={{
-                    backgroundColor: "#f5f9f0",
-                    padding: "2rem",
+                    background: "#f5f9f0",
                     borderRadius: "1rem",
-                    width: "400px",
-                    maxWidth: "90%",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.3)"
+                    padding: "2rem",
+                    width: "450px",
+                    border: "2px solid #daa520",
                 }}
             >
-                <h2 style={{ color: "#2f4f4f", marginBottom: "1rem", textAlign: "center" }}>
+                <h2 style={{ color: "#daa520", textAlign: "center", marginBottom: "1rem" }}>
                     {initialData ? "Modifica Evento" : "Crea Evento"}
                 </h2>
 
-                <div style={{ marginBottom: "1rem" }}>
-                    <label style={{ display: "block", marginBottom: "0.25rem", color: "#2f4f4f" }}>Nome</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        style={{
-                            width: "100%",
-                            padding: "0.5rem",
-                            borderRadius: "0.5rem",
-                            border: "2px solid #daa520"
-                        }}
-                    />
-                </div>
+                {/* ✅ Nome */}
+                <label style={{ fontWeight: "bold", color: "#2f4f4f" }}>Nome</label>
+                <input
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    style={{
+                        width: "100%",
+                        marginBottom: "1rem",
+                        padding: ".5rem",
+                        borderRadius: "0.5rem",
+                        border: "2px solid #daa520"
+                    }}
+                />
 
-                <div style={{ marginBottom: "1rem" }}>
-                    <label style={{ display: "block", marginBottom: "0.25rem", color: "#2f4f4f" }}>Descrizione</label>
-                    <textarea
-                        value={description}
-                        onChange={e => setDescription(e.target.value)}
+                {/* ✅ Descrizione */}
+                <label style={{ fontWeight: "bold", color: "#2f4f4f" }}>Descrizione</label>
+                <textarea
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                    style={{
+                        width: "100%",
+                        marginBottom: "1rem",
+                        padding: ".5rem",
+                        borderRadius: "0.5rem",
+                        border: "2px solid #daa520",
+                        minHeight: "60px"
+                    }}
+                />
+
+                {/* ✅ Attivo */}
+                <label style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: "1rem" }}>
+                    <input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} />
+                    Attivo
+                </label>
+
+                {/* ✅ Scadenza Candidature */}
+                <label style={{ fontWeight: "bold", color: "#2f4f4f" }}>Scadenza Candidature</label>
+                <input
+                    type="date"
+                    value={subscriptionExpiresAt}
+                    onChange={e => setSubscriptionExpiresAt(e.target.value)}
+                    style={{
+                        width: "100%",
+                        marginBottom: "1rem",
+                        padding: ".5rem",
+                        borderRadius: ".5rem",
+                        border: "2px solid #daa520"
+                    }}
+                />
+
+                {/* ✅ Data Premiazione */}
+                <label style={{ fontWeight: "bold", color: "#2f4f4f" }}>Data Premiazione</label>
+                <input
+                    type="date"
+                    value={expiresAt ?? ""}
+                    onChange={e => setExpiresAt(e.target.value || null)}
+                    style={{
+                        width: "100%",
+                        marginBottom: "1rem",
+                        padding: ".5rem",
+                        borderRadius: ".5rem",
+                        border: "2px solid #daa520"
+                    }}
+                />
+
+                {/* ✅ Numero partecipanti */}
+                <label style={{ fontWeight: "bold", color: "#2f4f4f" }}>Numero Partecipanti</label>
+                <input
+                    type="number"
+                    value={numberOfParticipants}
+                    onChange={e => setNumberOfParticipants(+e.target.value)}
+                    style={{
+                        width: "100%",
+                        marginBottom: "1rem",
+                        padding: ".5rem",
+                        borderRadius: ".5rem",
+                        border: "2px solid #daa520"
+                    }}
+                />
+
+                {/* ✅ Categorie — Dropdown Multi-select */}
+                <div ref={catRef} style={{ marginBottom: "1rem" }}>
+                    <label style={{ fontWeight: "bold", color: "#2f4f4f" }}>Categorie</label>
+
+                    {/* Badge selezionati */}
+                    <div style={{ margin: ".2rem 0" }}>
+                        {allCategories
+                            .filter(c => categories.includes(c.id))
+                            .map(c => (
+                                <span key={c.id} style={{
+                                    background: "#daa520",
+                                    color: "#2f4f4f",
+                                    padding: ".2rem .4rem",
+                                    borderRadius: ".4rem",
+                                    marginRight: ".3rem",
+                                    fontSize: ".75rem"
+                                }}>
+                                    🎬 {c.name}
+                                </span>
+                            ))}
+                    </div>
+
+                    <div
+                        onClick={() => setOpenCategories(prev => !prev)}
                         style={{
-                            width: "100%",
-                            padding: "0.5rem",
-                            borderRadius: "0.5rem",
+                            padding: ".5rem",
                             border: "2px solid #daa520",
-                            minHeight: "60px"
+                            borderRadius: ".5rem",
+                            cursor: "pointer",
+                            background: "#fff",
+                            marginBottom: ".3rem",
+                            userSelect: "none"
                         }}
-                    />
+                    >
+                        Seleziona categorie ⌄
+                    </div>
+
+                    {openCategories && (
+                        <div
+                            style={{
+                                background: "#fff",
+                                border: "2px solid #daa520",
+                                borderRadius: ".5rem",
+                                maxHeight: "120px",
+                                overflowY: "auto",
+                                padding: ".5rem"
+                            }}
+                        >
+                            {allCategories.map(c => (
+                                <label key={c.id} style={{ display: "block", fontSize: ".85rem", marginBottom: ".3rem" }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={categories.includes(c.id)}
+                                        onChange={() => setCategories(prev => toggleValue(prev, c.id))}
+                                    />{" "}
+                                    {c.name}
+                                </label>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                <div style={{ marginBottom: "1rem" }}>
-                    <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#2f4f4f" }}>
-                        <input
-                            type="checkbox"
-                            checked={isActive}
-                            onChange={e => setIsActive(e.target.checked)}
-                        />
-                        Attivo
-                    </label>
-                </div>
+                {/* ✅ Partecipanti — Dropdown Multi-select */}
+                <div ref={partRef} style={{ marginBottom: "1.5rem" }}>
+                    <label style={{ fontWeight: "bold", color: "#2f4f4f" }}>Partecipanti</label>
 
-                <div style={{ marginBottom: "1rem" }}>
-                    <label style={{ display: "block", marginBottom: "0.25rem", color: "#2f4f4f" }}>Scadenza iscrizione</label>
-                    <input
-                        type="datetime-local"
-                        value={subscriptionExpiresAt ? subscriptionExpiresAt.slice(0,16) : ""}
-                        onChange={e => setSubscriptionExpiresAt(e.target.value)}
+                    <div style={{ margin: ".2rem 0" }}>
+                        {allUsers
+                            .filter(u => participants.includes(u.id))
+                            .map(u => (
+                                <span key={u.id} style={{
+                                    background: "#2f4f4f",
+                                    color: "#daa520",
+                                    padding: ".2rem .4rem",
+                                    borderRadius: ".4rem",
+                                    marginRight: ".3rem",
+                                    fontSize: ".75rem"
+                                }}>
+                                    👤 {u.username}
+                                </span>
+                            ))}
+                    </div>
+
+                    <div
+                        onClick={() => setOpenParticipants(prev => !prev)}
                         style={{
-                            width: "100%",
-                            padding: "0.5rem",
-                            borderRadius: "0.5rem",
-                            border: "2px solid #daa520"
+                            padding: ".5rem",
+                            border: "2px solid #daa520",
+                            borderRadius: ".5rem",
+                            cursor: "pointer",
+                            background: "#fff",
+                            marginBottom: ".3rem",
+                            userSelect: "none"
                         }}
-                    />
+                    >
+                        Seleziona partecipanti ⌄
+                    </div>
+
+                    {openParticipants && (
+                        <div
+                            style={{
+                                background: "#fff",
+                                border: "2px solid #daa520",
+                                borderRadius: ".5rem",
+                                maxHeight: "140px",
+                                overflowY: "auto",
+                                padding: ".5rem"
+                            }}
+                        >
+                            {allUsers.map(u => (
+                                <label key={u.id} style={{ display: "block", fontSize: ".85rem", marginBottom: ".3rem" }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={participants.includes(u.id)}
+                                        onChange={() => setParticipants(prev => toggleValue(prev, u.id))}
+                                    />{" "}
+                                    {u.username}
+                                </label>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                <div style={{ marginBottom: "1rem" }}>
-                    <label style={{ display: "block", marginBottom: "0.25rem", color: "#2f4f4f" }}>Numero partecipanti</label>
-                    <input
-                        type="number"
-                        value={numberOfParticipants}
-                        onChange={e => setNumberOfParticipants(Number(e.target.value))}
-                        style={{
-                            width: "100%",
-                            padding: "0.5rem",
-                            borderRadius: "0.5rem",
-                            border: "2px solid #daa520"
-                        }}
-                    />
-                </div>
-
-                <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
+                {/* ✅ Bottoni */}
+                <div style={{ display: "flex", gap: "1rem" }}>
                     <button
                         onClick={onClose}
                         style={{
                             flex: 1,
                             backgroundColor: "#ff4d4f",
                             color: "#fff",
-                            padding: "0.5rem",
-                            borderRadius: "0.5rem",
-                            border: "none",
                             fontWeight: "bold",
+                            padding: ".5rem",
+                            borderRadius: ".5rem",
+                            border: "none",
                             cursor: "pointer"
                         }}
                     >
                         Annulla
                     </button>
+
                     <button
-                        onClick={() => onSubmit({ name, description, isActive, subscriptionExpiresAt, numberOfParticipants })}
+                        onClick={() => onSubmit({
+                            name,
+                            description,
+                            isActive,
+                            subscriptionExpiresAt,
+                            expiresAt,
+                            numberOfParticipants,
+                            categories,
+                            participants
+                        })}
                         style={{
                             flex: 1,
                             backgroundColor: "#2f4f4f",
                             color: "#daa520",
-                            padding: "0.5rem",
-                            borderRadius: "0.5rem",
-                            border: "none",
                             fontWeight: "bold",
+                            padding: ".5rem",
+                            borderRadius: ".5rem",
+                            border: "none",
                             cursor: "pointer"
                         }}
                     >
                         {initialData ? "Salva" : "Crea"}
                     </button>
                 </div>
+
             </div>
         </div>
     );

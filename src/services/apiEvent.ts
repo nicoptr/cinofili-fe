@@ -1,15 +1,52 @@
 import {customFetch} from "./customFetch.ts";
 
+export interface ApiEventParticipant {
+    id: number;
+    username: string;
+    email: string;
+    avatarUrl?: string | null;
+    note?: string | null;
+    deleted: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface ApiEventCategory {
+    id: number;
+    name: string;
+    description: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface ApiEventSubscription {
+    id: number;
+    ownerId: number;
+    movieName: string;
+    isValid: boolean;
+    categoryId: number;
+    eventId: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export interface ApiEvent {
     id: number;
     name: string;
     description: string;
     isActive: boolean;
     expiresAt: string | null;
-    subscriptionExpiresAt: string | null;
+    subscriptionExpiresAt: string;
     numberOfParticipants: number;
     createdAt: string;
     updatedAt: string;
+    participants: ApiEventParticipant[];
+    categories: ApiEventCategory[];
+    subscriptions: ApiEventSubscription[];
+}
+
+export interface EventPaginatedResponse {
+    docs: ApiEvent[];
 }
 
 export interface EventFormBody {
@@ -18,6 +55,8 @@ export interface EventFormBody {
     isActive: boolean;
     subscriptionExpiresAt: string | null;
     numberOfParticipants: number;
+    categories: number[];
+    participants: number[];
 }
 
 export interface EventsResponse {
@@ -54,16 +93,15 @@ export async function createEvent(body: EventFormBody): Promise<ApiEvent> {
 
 }
 
-export async function updateEvent(id: number, body: EventFormBody): Promise<ApiEvent> {
-    try {
-        return await customFetch(true, `/events/${id}`, {
+export async function updateEvent(id: number, data: EventFormBody) {
+    return customFetch(
+        true,
+        `/events/${id}`,
+        {
             method: "PATCH",
-            body: JSON.stringify(body),
-        });
-    } catch (err: any) {
-    console.error("updateEvent error:", err);
-    throw err;
-}
+            body: JSON.stringify(data),
+        }
+    );
 }
 
 export async function deleteEvent(id: number): Promise<void> {
