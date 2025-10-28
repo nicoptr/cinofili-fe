@@ -35,7 +35,7 @@ export interface ApiEvent {
     name: string;
     description: string;
     isActive: boolean;
-    expiresAt: string | null;
+    expiresAt: string;
     subscriptionExpiresAt: string;
     numberOfParticipants: number;
     createdAt: string;

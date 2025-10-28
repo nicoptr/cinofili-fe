@@ -141,9 +141,8 @@ export default function AdminHome() {
                         const progress = Math.min((current / max) * 100, 100);
 
                         const deadline = new Date(event.subscriptionExpiresAt).toLocaleDateString("it-IT");
-                        const awardDate = event.expiresAt
-                            ? new Date(event.expiresAt).toLocaleDateString("it-IT")
-                            : "N/D";
+                        const awardDate = new Date(event.expiresAt).toLocaleDateString("it-IT");
+
 
                         return (
                             <li key={event.id} style={{
@@ -298,7 +297,7 @@ export default function AdminHome() {
                         numberOfParticipants: editingEvent.numberOfParticipants,
                         categories: editingEvent.categories?.map(c => c.id) || [],
                         participants: editingEvent.participants?.map(p => p.id) || [],
-                        expiresAt: editingEvent.expiresAt?.length ? editingEvent.expiresAt : null,
+                        expiresAt: editingEvent.expiresAt,
                     } : undefined}
                 />
             </>

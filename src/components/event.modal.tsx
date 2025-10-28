@@ -162,7 +162,7 @@ const EventModal: FC<EventModalProps> = ({
                 <label style={{ fontWeight: "bold", color: "#2f4f4f" }}>Data Premiazione</label>
                 <input
                     type="date"
-                    value={expiresAt ?? ""}
+                    value={expiresAt}
                     onChange={e => setExpiresAt(e.target.value)}
                     style={{
                         width: "100%",
