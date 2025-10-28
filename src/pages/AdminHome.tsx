@@ -3,7 +3,7 @@ import {
     type ApiEvent, createEvent,
     deleteEvent,
     type EventFormBody,
-    fetchEvents,
+    fetchEvents, inviteParticipants,
     updateEvent
 } from "../services/apiEvent";
 import {
@@ -236,7 +236,20 @@ export default function AdminHome() {
                                                 cursor: "pointer",
                                                 fontWeight: "bold"
                                             }}
-                                            onClick={() => alert("Invito partecipanti (TODO)")}
+                                            onClick={async () => {
+                                                if (!confirm("Confermando questa operazione tutti i partecipanti inseriti riceveranno un'email di invito a presentare una candidatura. Nell'email sarà specificata la categoria da utlizzare e non potranno cambiarla. Questa operazione è possibile solo se il numero di categorie è minore del numero di partecipanti. Ogni partecipante riceverà una categoria in maniera del tutto casuale. ")) return;
+                                                try {
+                                                    await inviteParticipants(event.id);
+
+                                                    setLoading(true);
+                                                    fetchEvents()
+                                                        .then(data => setEvents(data.docs))
+                                                        .catch(err => setError(err.message))
+                                                        .finally(() => setLoading(false));
+                                                } catch (err: any) {
+                                                    alert("Errore durante l'invalidazione: " + err.message);
+                                                }
+                                            }}
                                         >
                                             Invita partecipanti
                                         </button>

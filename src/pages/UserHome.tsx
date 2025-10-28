@@ -101,7 +101,7 @@ export default function UserHome() {
                 </button>
 
                 <h1 style={{ color: "#daa520", textAlign: "center", marginBottom: "2rem" }}>
-                    Le tue iscrizioni
+                    Le tue candidature
                 </h1>
 
                 {/* Pulsante Crea */}

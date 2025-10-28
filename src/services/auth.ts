@@ -26,7 +26,6 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
 
 
     } catch (err: any) {
-        console.error("Login API error:", err);
         throw err;
     }
 }
@@ -58,7 +57,6 @@ export async function getMe(): Promise<UserProfile> {
         localStorage.setItem("userProfile", JSON.stringify(result));
         return result as UserProfile;
     } catch (err: any) {
-        console.error("getProfile error:", err);
         throw err;
     }
 }
@@ -76,7 +74,6 @@ export interface RegisterResponse {
 }
 
 export async function registerUser(body: RegisterBody): Promise<RegisterResponse> {
-    console.log(body);
     try {
         return await customFetch(false, `/users/register`, {
             method: "POST",

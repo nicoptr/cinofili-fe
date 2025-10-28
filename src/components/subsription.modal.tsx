@@ -29,7 +29,6 @@ export default function SubscriptionModal({
         if (!isOpen) return;
 
         const loggedUser = JSON.parse(localStorage.getItem("userProfile")!) as UserProfile;
-        console.log("loggedUser: ", loggedUser);
 
         fetchEvents().then(r => {
             const filteredEvents = r.docs.filter(e => e.participants.some(p => p.id === loggedUser?.id) && e.isActive);
@@ -44,30 +43,25 @@ export default function SubscriptionModal({
     useEffect(() => {
         if (!isOpen) return;
 
-        console.log("event selected: ", eventId);
         if (!eventId) {
             setCategories([]);
             return;
         }
 
         fetchCategories().then(r => {
-            console.log("events: ", events);
             const filteredByEventCategories = r.docs
                 .filter(c => events
                     .find(e => e.id === eventId)
                     ?.categories
                     .map(ec => ec.id)
                     .includes(c.id));
-            console.log("by event categories: ", filteredByEventCategories);
             const loggedUser = JSON.parse(localStorage.getItem("userProfile")!) as ApiEventParticipant;
-            console.log("loggedUser: ", loggedUser);
 
             const filteredByUserCategories = filteredByEventCategories
                 .filter(c => loggedUser.eventSpecification
                     ?.filter(es => es.eventId === eventId)
                     .map(es => es.categoryId)
                     .includes(c.id));
-            console.log("filteredByUserCategories: ", filteredByUserCategories);
 
             setCategories(filteredByUserCategories);
         }).catch(console.error);
