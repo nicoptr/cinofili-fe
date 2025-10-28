@@ -134,74 +134,72 @@ export default function AdminHome() {
 
                         return (
                             <li className="card" key={event.id}>
-                                <div className="card-header">
-                                    <div className="card-content">
-                                        <strong>{event.name}</strong>
-                                        <p>{event.description}</p>
+                                <div className="card-content">
+                                    <strong>{event.name}</strong>
+                                    <p>{event.description}</p>
 
-                                        <div className="card-categories">
-                                            {event.categories.map(cat => (
-                                                <span key={cat.id} className="category-badge">
-                                                    {cat.name.toUpperCase()}
-                                                </span>
-                                            ))}
-                                        </div>
-
-                                        <div className="card-progress-bar">
-                                            <div className="bar" style={{ width: `${progress}%` }} />
-                                        </div>
-                                        <p>{current}/{max} partecipanti iscritti</p>
-
-                                        <div className="card-progress-bar">
-                                            <div className="bar" style={{ width: `${subsProgress}%` }} />
-                                        </div>
-                                        <p>{event.subscriptions?.length || 0}/{max} candidature inviate</p>
-
-                                        <p>Scadenza candidature: <b>{deadline}</b></p>
-                                        <p>Data premiazione: <b>{awardDate}</b></p>
+                                    <div className="card-categories">
+                                        {event.categories.map(cat => (
+                                            <span key={cat.id} className="category-badge">
+                                                {cat.name.toUpperCase()}
+                                            </span>
+                                        ))}
                                     </div>
 
-                                    <div className="card-actions">
-                                        <button
-                                            className="button"
-                                            onClick={async () => {
-                                                if (!confirm("Confermando questa operazione tutti i partecipanti inseriti riceveranno un'email di invito a presentare una candidatura. ...")) return;
-                                                try {
-                                                    await inviteParticipants(event.id);
+                                    <p>Scadenza candidature: <b>{deadline}</b></p>
+                                    <p>🏆​ Data premiazione: <b>{awardDate}</b></p>
 
-                                                    setLoading(true);
-                                                    fetchEvents()
-                                                        .then(data => setEvents(data.docs))
-                                                        .catch(err => setError(err.message))
-                                                        .finally(() => setLoading(false));
-                                                } catch (err: any) {
-                                                    alert("Errore durante l'invalidazione: " + err.message);
-                                                }
-                                            }}
-                                        >
-                                            Invita partecipanti
-                                        </button>
-                                        <button
-                                            className="button"
-                                            onClick={() => {
-                                                setEditingEvent(event);
-                                                setIsEventModalOpen(true);
-                                            }}
-                                        >
-                                            Modifica
-                                        </button>
-                                        <button
-                                            className="button"
-                                            onClick={async () => {
-                                                if (!confirm(`Eliminare '${event.name}'?`)) return;
-                                                await deleteEvent(event.id);
+                                    <div className="card-progress-bar">
+                                        <div className="bar" style={{ width: `${progress}%` }} />
+                                    </div>
+                                    <p>{current}/{max} partecipanti iscritti</p>
+
+                                    <div className="card-progress-bar">
+                                        <div className="bar" style={{ width: `${subsProgress}%` }} />
+                                    </div>
+                                    <p>{event.subscriptions?.length || 0}/{max} candidature inviate</p>
+                                </div>
+
+                                <div className="card-actions">
+                                    <button
+                                        className="button"
+                                        onClick={async () => {
+                                            if (!confirm("Confermando questa operazione tutti i partecipanti inseriti riceveranno un'email di invito a presentare una candidatura. ...")) return;
+                                            try {
+                                                await inviteParticipants(event.id);
+
                                                 setLoading(true);
-                                                fetchEvents().then(d => setEvents(d.docs)).finally(() => setLoading(false));
-                                            }}
-                                        >
-                                            Elimina
-                                        </button>
-                                    </div>
+                                                fetchEvents()
+                                                    .then(data => setEvents(data.docs))
+                                                    .catch(err => setError(err.message))
+                                                    .finally(() => setLoading(false));
+                                            } catch (err: any) {
+                                                alert("Errore durante l'invalidazione: " + err.message);
+                                            }
+                                        }}
+                                    >
+                                        Invita partecipanti
+                                    </button>
+                                    <button
+                                        className="button"
+                                        onClick={() => {
+                                            setEditingEvent(event);
+                                            setIsEventModalOpen(true);
+                                        }}
+                                    >
+                                        Modifica
+                                    </button>
+                                    <button
+                                        className="button"
+                                        onClick={async () => {
+                                            if (!confirm(`Eliminare '${event.name}'?`)) return;
+                                            await deleteEvent(event.id);
+                                            setLoading(true);
+                                            fetchEvents().then(d => setEvents(d.docs)).finally(() => setLoading(false));
+                                        }}
+                                    >
+                                        Elimina
+                                    </button>
                                 </div>
 
                                 <button
@@ -219,7 +217,7 @@ export default function AdminHome() {
                                             event.subscriptions.map(sub => (
                                                 <div key={sub.id} className={`sub-card ${sub.isValid ? "" : "invalid"}`}>
                                                     <div>
-                                                        <span className="movie-title">{sub.movieName}</span>
+                                                        <span className="movie-title">📽️​ {sub.movieName}</span>
                                                         <div className="category-tag">
                                                             {event.categories.find(cat => cat.id === sub.categoryId)?.name.toUpperCase() ?? "SENZA CATEGORIA"}
                                                         </div>

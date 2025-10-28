@@ -120,6 +120,7 @@
 }
 
 .button-expand {
+    display: block;
     background-color: #daa520;
     color: #2f4f4f;
     padding: .4rem .7rem;
@@ -128,6 +129,9 @@
     cursor: pointer;
     font-weight: bold;
     margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .sub-card {
@@ -168,6 +172,27 @@
     font-size: 0.85rem;
     font-weight: normal; /* Peso del font più leggero per la categoria */
     margin-left: 0.5rem;
+}
+
+/* Centrare i pulsanti "Modifica" e "Elimina" */
+.centered-action-button {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0.5rem;
+    width: 90%; /* Larghezza dei tasti per una visualizzazione mobile-friendly */
+}
+
+.category-badge {
+    display: inline-block;
+    background-color: #daa520; /* Colore di sfondo per il badge */
+    color: #2f4f4f; /* Colore del testo */
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    font-size: 0.85rem;
+    font-weight: bold; /* In grassetto per dare maggiore importanza */
+    margin-left: 0.5rem; /* Spazio tra il badge e gli altri elementi */
+    margin-bottom: 0.2rem;
 }
 
 /* Media Queries per mobile */
