@@ -15,8 +15,12 @@ import {
 } from "../services/category";
 import CategoryModal from "../components/category.modal";
 import EventModal from "../components/event.modal";
+import {invalidate} from "../services/subscription.ts";
+import {useNavigate} from "react-router-dom";
 
 export default function AdminHome() {
+
+    const navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState<"events" | "categories">("events");
     const [events, setEvents] = useState<ApiEvent[]>([]);
@@ -140,6 +144,9 @@ export default function AdminHome() {
                         const current = event.participants?.length ?? 0;
                         const progress = Math.min((current / max) * 100, 100);
 
+                        const subsProgress = Math.min(((event.subscriptions.length || 0) / max) * 100, 100);
+
+
                         const deadline = new Date(event.subscriptionExpiresAt).toLocaleDateString("it-IT");
                         const awardDate = new Date(event.expiresAt).toLocaleDateString("it-IT");
 
@@ -191,6 +198,23 @@ export default function AdminHome() {
                                             {current}/{max} partecipanti iscritti
                                         </p>
 
+                                        {/* ✅ Barra progressiva candidature */}
+                                        <div style={{
+                                            backgroundColor: "#d3e6c5",
+                                            height: "10px", width: "100%",
+                                            borderRadius: "0.5rem", overflow: "hidden"
+                                        }}>
+                                            <div style={{
+                                                height: "100%", width: `${subsProgress}%`,
+                                                backgroundColor: progress >= 100 ? "#daa520" : "#397d7d",
+                                                transition: "width .3s"
+                                            }} />
+                                        </div>
+
+                                        <p style={{ fontSize: "0.85rem", margin: "0.25rem 0", color: "#2f4f4f" }}>
+                                            {event.subscriptions?.length || 0}/{max} candidature inviate
+                                        </p>
+
                                         {/* ✅ Date */}
                                         <p style={{ margin: 0, fontSize: "0.85rem", color: "#2f4f4f" }}>
                                             Scadenza candidature: <b>{deadline}</b>
@@ -202,6 +226,20 @@ export default function AdminHome() {
 
                                     {/* ✅ Pulsanti */}
                                     <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginLeft: "1rem" }}>
+                                        <button
+                                            style={{
+                                                backgroundColor: "#1e7e34",
+                                                color: "#fff",
+                                                padding: ".4rem .7rem",
+                                                borderRadius: ".5rem",
+                                                border: "none",
+                                                cursor: "pointer",
+                                                fontWeight: "bold"
+                                            }}
+                                            onClick={() => alert("Invito partecipanti (TODO)")}
+                                        >
+                                            Invita partecipanti
+                                        </button>
                                         <button
                                             style={{
                                                 backgroundColor: "#2f4f4f", color: "#daa520",
@@ -252,29 +290,59 @@ export default function AdminHome() {
                                             event.subscriptions.map(sub => (
                                                 <div key={sub.id} style={{
                                                     backgroundColor: "#fff",
-                                                    border: "1px solid #2f4f4f",
+                                                    border: `2px solid ${sub.isValid ? "#2f4f4f" : "#ff4d4f"}`,
                                                     borderRadius: "0.5rem",
                                                     padding: ".6rem",
                                                     marginBottom: ".5rem",
                                                     display: "flex",
                                                     justifyContent: "space-between"
                                                 }}>
-                                                    <span style={{ color: "#2f4f4f" }}>🎬 {sub.movieName}</span>
+                <span
+                    style={{
+                        color: sub.isValid ? "#2f4f4f" : "#ff4d4f",
+                        fontWeight: sub.isValid ? "normal" : "bold"
+                    }}
+                >
+                    🎬 {sub.movieName}
+                </span>
 
-                                                    <button
-                                                        style={{
-                                                            backgroundColor: "#ff4d4f", color: "#fff",
-                                                            padding: ".3rem .6rem",
-                                                            borderRadius: ".4rem",
-                                                            border: "none",
-                                                            cursor: "pointer",
+                                                    {sub.isValid ? (
+                                                        <button
+                                                            style={{
+                                                                backgroundColor: "#ff4d4f", color: "#fff",
+                                                                padding: ".3rem .6rem",
+                                                                borderRadius: ".4rem",
+                                                                border: "none",
+                                                                cursor: "pointer",
+                                                                fontWeight: "bold",
+                                                                fontSize: ".75rem"
+                                                            }}
+                                                            onClick={async () => {
+                                                                if (!confirm(`Vuoi davvero invalidare la candidatura "${sub.movieName}"?`)) return;
+                                                                try {
+                                                                    await invalidate(sub.id);
+
+                                                                    setLoading(true);
+                                                                    fetchEvents()
+                                                                        .then(data => setEvents(data.docs))
+                                                                        .catch(err => setError(err.message))
+                                                                        .finally(() => setLoading(false));
+                                                                } catch (err: any) {
+                                                                    alert("Errore durante l'invalidazione: " + err.message);
+                                                                }
+                                                            }}
+                                                        >
+                                                            Invalida
+                                                        </button>
+                                                    ) : (
+                                                        <span style={{
+                                                            fontSize: ".75rem",
                                                             fontWeight: "bold",
-                                                            fontSize: ".75rem"
-                                                        }}
-                                                        onClick={() => alert("TODO invalida")}
-                                                    >
-                                                        Invalida
-                                                    </button>
+                                                            color: "#ff4d4f"
+                                                        }}>
+                        ⏳ In attesa di modifica
+                    </span>
+                                                    )}
                                                 </div>
                                             ))
                                         )}
@@ -386,6 +454,20 @@ export default function AdminHome() {
     return (
         <div style={{ padding: "2rem", backgroundColor: "#d0f0c0", minHeight: "100vh", position: "relative" }}>
 
+            {/* ✅ Pulsante "Presenta candidatura" */}
+            <button
+                onClick={() => navigate('/home')}
+                style={{
+                    position: "absolute", top: "1.5rem", left: "2rem",
+                    backgroundColor: "#2f4f4f", color: "#daa520",
+                    padding: "0.5rem 1rem", border: "none",
+                    borderRadius: "0.5rem", cursor: "pointer",
+                    fontWeight: "bold"
+                }}
+            >
+                Presenta candidatura
+            </button>
+
             {/* ✅ Logout */}
             <button
                 onClick={handleLogout}
@@ -400,7 +482,7 @@ export default function AdminHome() {
                 Logout
             </button>
 
-            <h1 style={{ textAlign: "center", color: "#daa520" }}>Admin Dashboard</h1>
+            <h1 style={{ textAlign: "center", color: "#daa520" }}>Pannello di controllo della Presidentessa</h1>
 
             {/* ✅ Tabs */}
             <div style={{ display: "flex", justifyContent: "center", marginBottom: "2rem", gap: "1rem" }}>

@@ -5,8 +5,9 @@ import {
     type Subscription,
     updateSubscription
 } from "../services/subscription";
-import {getMe} from "../services/auth.ts";
+import {getMe, type UserProfile} from "../services/auth.ts";
 import SubscriptionModal from "../components/subsription.modal.tsx";
+import {useNavigate} from "react-router-dom";
 
 export default function UserHome() {
     const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -14,6 +15,9 @@ export default function UserHome() {
     const [error, setError] = useState<string | null>(null);
     const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
     const [editingSubscription, setEditingSubscription] = useState<any | null>(null);
+    const [role, setRole] = useState("");
+
+    const navigate = useNavigate();
 
     const handleLogout = async () => {
         localStorage.removeItem("token");
@@ -25,6 +29,11 @@ export default function UserHome() {
     };
 
     useEffect(() => {
+        const userProfile = localStorage.getItem("userProfile");
+        if (userProfile) {
+            const parsedProfile = JSON.parse(userProfile) as UserProfile;
+            setRole(parsedProfile.roles[0].roleName);
+        }
         setLoading(true);
         fetchMySubscriptions()
             .then(data => setSubscriptions(data.docs))
@@ -60,6 +69,19 @@ export default function UserHome() {
         <>
             <div style={{ padding: "2rem", backgroundColor: "#d0f0c0", minHeight: "100vh", position: "relative" }}>
 
+                { role === 'GOD' && <button
+                    onClick={() => navigate('/admin-home')}
+                    style={{
+                        position: "absolute", top: "1.5rem", left: "2rem",
+                        backgroundColor: "#2f4f4f", color: "#daa520",
+                        padding: "0.5rem 1rem", border: "none",
+                        borderRadius: "0.5rem", cursor: "pointer",
+                        fontWeight: "bold"
+                    }}
+                >
+                    Pannello di controllo
+                </button>
+                }
                 <button
                     onClick={handleLogout}
                     style={{

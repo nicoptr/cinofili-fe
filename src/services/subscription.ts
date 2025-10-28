@@ -62,3 +62,11 @@ export async function updateSubscription(id: number, body: SubscriptionForm) {
         body: JSON.stringify(body),
     });
 }
+
+export async function invalidate(subscriptionId: number): Promise<void> {
+    await customFetch<void>(true, `/subscriptions/invalidate/${subscriptionId}`, {
+        method: "PATCH",
+        body: JSON.stringify({})
+
+    });
+}

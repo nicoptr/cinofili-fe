@@ -9,6 +9,12 @@ export interface ApiEventParticipant {
     deleted: boolean;
     createdAt: string;
     updatedAt: string;
+    eventSpecification?: EventSpecification[] | null; // Nuovo campo che contiene la relazione tra evento e categoria
+}
+
+export interface EventSpecification {
+    eventId: number;
+    categoryId: number;
 }
 
 export interface ApiEventCategory {
@@ -113,4 +119,15 @@ export async function deleteEvent(id: number): Promise<void> {
         console.error("deleteEvent error:", err);
         throw err;
     }
+}
+
+export async function inviteParticipants(eventId: number): Promise<void> {
+    return customFetch<void>(
+        true,
+        `/events/invite/${eventId}`,
+        {
+            method: "POST",
+            body: JSON.stringify({})
+        }
+    );
 }
