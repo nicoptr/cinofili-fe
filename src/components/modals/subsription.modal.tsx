@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { type Category, fetchCategories } from "../services/category";
-import {type ApiEvent, type ApiEventParticipant, fetchEvents} from "../services/apiEvent";
-import { type SubscriptionForm } from "../services/subscription";
-import { type UserProfile} from "../services/auth.ts";
-import * as React from "react";
+import './Modal.css';
+import {type ApiEvent, type ApiEventParticipant, fetchEvents} from "../../services/apiEvent.ts";
+import type {UserProfile} from "../../services/auth.ts";
+import {type Category, fetchCategories} from "../../services/category.ts";
+import type {SubscriptionForm} from "../../services/subscription.ts";
 
 interface Props {
     isOpen: boolean;
@@ -56,14 +56,12 @@ export default function SubscriptionModal({
                     .map(ec => ec.id)
                     .includes(c.id));
             const loggedUser = JSON.parse(localStorage.getItem("userProfile")!) as ApiEventParticipant;
-            console.log("filteredByEventCategories", filteredByEventCategories);
 
             const filteredByUserCategories = filteredByEventCategories
                 .filter(c => loggedUser.eventSpecification
                     ?.filter(es => es.eventId === eventId)
                     .map(es => es.categoryId)
                     .includes(c.id));
-            console.log("filteredByUserCategories", filteredByUserCategories);
 
             setCategories(filteredByUserCategories);
         }).catch(console.error);
@@ -81,61 +79,33 @@ export default function SubscriptionModal({
     if (!isOpen) return null;
 
     return (
-        <div style={{
-            position: "fixed",
-            top: 0, left: 0,
-            width: "100%", height: "100%",
-            backgroundColor: "rgba(0,0,0,0.4)",
-            display: "flex", justifyContent: "center", alignItems: "center",
-            zIndex: 1000
-        }}>
-            <div style={{
-                backgroundColor: "#f5f9f0",
-                padding: "2rem",
-                borderRadius: "1rem",
-                border: "2px solid #daa520",
-                width: "420px",
-                position: "relative"
-            }}>
-                <h2 style={{ textAlign: "center", color: "#daa520", marginBottom: "1rem" }}>
-                    {initialData ? "Modifica iscrizione" : "Nuova iscrizione"}
-                </h2>
+        <div className="modal-overlay">
+            <div className="modal-container">
+                <h2 className="modal-title">{initialData ? "Modifica iscrizione" : "Nuova iscrizione"}</h2>
 
                 {/* Info */}
-                <p style={{ fontSize: "0.9rem", color: "#2f4f4f", marginBottom: "1rem" }}>
+                <p className="modal-info-text">
                     ⚠️ Alla conferma verrà inviata una mail alla Presidentessa per l’approvazione.
                 </p>
 
                 <form onSubmit={handleSubmit}>
                     {/* Nome film */}
-                    <label style={{ color: "#2f4f4f", fontWeight: "bold" }}>Nome Film</label>
+                    <label className="modal-label">Nome Film</label>
                     <input
                         type="text"
                         value={movieName}
                         onChange={(e) => setMovieName(e.target.value)}
                         required
-                        style={{
-                            width: "100%",
-                            padding: "0.5rem",
-                            borderRadius: "0.5rem",
-                            marginBottom: "1rem",
-                            border: "1px solid #daa520"
-                        }}
+                        className="modal-input"
                     />
 
                     {/* Evento */}
-                    <label style={{ color: "#2f4f4f", fontWeight: "bold" }}>Evento</label>
+                    <label className="modal-label">Evento</label>
                     <select
                         value={eventId}
                         onChange={(e) => setEventId(Number(e.target.value))}
                         required
-                        style={{
-                            width: "100%",
-                            padding: "0.5rem",
-                            borderRadius: "0.5rem",
-                            marginBottom: "1rem",
-                            border: "1px solid #daa520"
-                        }}
+                        className="modal-select"
                     >
                         <option value="" disabled>Seleziona</option>
                         {events.map(ev => (
@@ -144,18 +114,12 @@ export default function SubscriptionModal({
                     </select>
 
                     {/* Categoria */}
-                    <label style={{ color: "#2f4f4f", fontWeight: "bold" }}>Categoria</label>
+                    <label className="modal-label">Categoria</label>
                     <select
                         value={categoryId}
                         onChange={(e) => setCategoryId(Number(e.target.value))}
                         required
-                        style={{
-                            width: "100%",
-                            padding: "0.5rem",
-                            borderRadius: "0.5rem",
-                            marginBottom: "1rem",
-                            border: "1px solid #daa520"
-                        }}
+                        className="modal-select"
                     >
                         <option value="" disabled>Seleziona</option>
                         {categories.map(c => (
@@ -164,33 +128,18 @@ export default function SubscriptionModal({
                     </select>
 
                     {/* Bottoni */}
-                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1rem" }}>
+                    <div className="modal-buttons">
                         <button
                             type="button"
                             onClick={onClose}
-                            style={{
-                                backgroundColor: "#ccc",
-                                color: "#000",
-                                padding: "0.5rem 1rem",
-                                borderRadius: "0.5rem",
-                                border: "none",
-                                cursor: "pointer"
-                            }}
+                            className="modal-button modal-button-cancel"
                         >
                             Annulla
                         </button>
 
                         <button
                             type="submit"
-                            style={{
-                                backgroundColor: "#daa520",
-                                color: "#2f4f4f",
-                                padding: "0.5rem 1rem",
-                                borderRadius: "0.5rem",
-                                border: "none",
-                                cursor: "pointer",
-                                fontWeight: "bold"
-                            }}
+                            className="modal-button modal-button-submit"
                         >
                             {initialData ? "Salva" : "Candidati"}
                         </button>

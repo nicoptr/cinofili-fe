@@ -6,7 +6,7 @@ import {
     updateSubscription
 } from "../services/subscription";
 import { getMe, type UserProfile } from "../services/auth.ts";
-import SubscriptionModal from "../components/subsription.modal.tsx";
+import SubscriptionModal from "../components/modals/subsription.modal.tsx";
 import { useNavigate } from "react-router-dom";
 import "../App.css";  // Importa il file CSS
 

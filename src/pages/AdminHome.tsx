@@ -13,8 +13,8 @@ import {
     fetchCategories,
     updateCategory
 } from "../services/category";
-import CategoryModal from "../components/category.modal";
-import EventModal from "../components/event.modal";
+import CategoryModal from "../components/modals/category.modal.tsx";
+import EventModal from "../components/modals/event.modal.tsx";
 import { invalidate } from "../services/subscription.ts";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
