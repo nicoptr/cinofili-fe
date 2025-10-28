@@ -21,6 +21,7 @@ export default function Login() {
             await login({ usernameOrEmail: username, password });
 
             const user = await getMe();
+            localStorage.setItem("userProfile", JSON.stringify(user));
             if (user?.roles![0].roleName === "GOD") {
                 navigate("/admin-home");
             } else {

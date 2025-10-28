@@ -70,3 +70,10 @@ export async function invalidate(subscriptionId: number): Promise<void> {
 
     });
 }
+
+export async function deleteSubscription(subscriptionId: number) {
+    await customFetch<void>(true, `/subscriptions/${subscriptionId}`, {
+        method: "DELETE",
+        body: JSON.stringify({})
+    });
+}

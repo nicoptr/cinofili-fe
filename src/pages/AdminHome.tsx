@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import {
     type ApiEvent, createEvent,
     deleteEvent,
@@ -75,9 +75,9 @@ export default function AdminHome() {
     const handleSubmitCategory = async (name: string, description: string) => {
         try {
             if (editingCategory) {
-                await updateCategory(editingCategory.id, { name, description });
+                await updateCategory(editingCategory.id, {name, description});
             } else {
-                await createCategory({ name, description });
+                await createCategory({name, description});
             }
 
             setIsCategoryModalOpen(false);
@@ -117,12 +117,12 @@ export default function AdminHome() {
 
 
     const renderEventsTab = () => {
-        if (loading) return <p style={{ textAlign: "center" }}>Caricamento eventi...</p>;
-        if (error) return <p style={{ textAlign: "center", color: "red" }}>Errore: {error}</p>;
+        if (loading) return <p style={{textAlign: "center"}}>Caricamento eventi...</p>;
+        if (error) return <p style={{textAlign: "center", color: "red"}}>Errore: {error}</p>;
 
         return (
             <>
-                <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+                <div style={{textAlign: "center", marginBottom: "1.5rem"}}>
                     <button
                         style={{
                             backgroundColor: "#daa520", color: "#2f4f4f",
@@ -130,13 +130,16 @@ export default function AdminHome() {
                             borderRadius: "0.5rem", cursor: "pointer",
                             fontWeight: "bold"
                         }}
-                        onClick={() => { setEditingEvent(null); setIsEventModalOpen(true); }}
+                        onClick={() => {
+                            setEditingEvent(null);
+                            setIsEventModalOpen(true);
+                        }}
                     >
                         Crea nuovo evento
                     </button>
                 </div>
 
-                <ul style={{ listStyle: "none", padding: 0 }}>
+                <ul style={{listStyle: "none", padding: 0}}>
                     {events.map(event => {
                         const expanded = expandedEvents[event.id] || false;
 
@@ -159,13 +162,13 @@ export default function AdminHome() {
                                 padding: "1rem",
                                 marginBottom: "1rem"
                             }}>
-                                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                    <div style={{ flex: 1 }}>
-                                        <strong style={{ color: "#2f4f4f", fontSize: "1.1rem" }}>{event.name}</strong>
-                                        <p style={{ margin: "0.25rem 0", color: "#2f4f4f" }}>{event.description}</p>
+                                <div style={{display: "flex", justifyContent: "space-between"}}>
+                                    <div style={{flex: 1}}>
+                                        <strong style={{color: "#2f4f4f", fontSize: "1.1rem"}}>{event.name}</strong>
+                                        <p style={{margin: "0.25rem 0", color: "#2f4f4f"}}>{event.description}</p>
 
                                         {/* ✅ Categorie */}
-                                        <div style={{ marginBottom: "0.5rem" }}>
+                                        <div style={{marginBottom: "0.5rem"}}>
                                             {event.categories.map(cat => (
                                                 <span key={cat.id} style={{
                                                     backgroundColor: "#daa520",
@@ -191,10 +194,10 @@ export default function AdminHome() {
                                                 height: "100%", width: `${progress}%`,
                                                 backgroundColor: progress >= 100 ? "#daa520" : "#2f4f4f",
                                                 transition: "width .3s"
-                                            }} />
+                                            }}/>
                                         </div>
 
-                                        <p style={{ fontSize: "0.85rem", margin: "0.25rem 0", color: "#2f4f4f" }}>
+                                        <p style={{fontSize: "0.85rem", margin: "0.25rem 0", color: "#2f4f4f"}}>
                                             {current}/{max} partecipanti iscritti
                                         </p>
 
@@ -208,24 +211,29 @@ export default function AdminHome() {
                                                 height: "100%", width: `${subsProgress}%`,
                                                 backgroundColor: progress >= 100 ? "#daa520" : "#397d7d",
                                                 transition: "width .3s"
-                                            }} />
+                                            }}/>
                                         </div>
 
-                                        <p style={{ fontSize: "0.85rem", margin: "0.25rem 0", color: "#2f4f4f" }}>
+                                        <p style={{fontSize: "0.85rem", margin: "0.25rem 0", color: "#2f4f4f"}}>
                                             {event.subscriptions?.length || 0}/{max} candidature inviate
                                         </p>
 
                                         {/* ✅ Date */}
-                                        <p style={{ margin: 0, fontSize: "0.85rem", color: "#2f4f4f" }}>
+                                        <p style={{margin: 0, fontSize: "0.85rem", color: "#2f4f4f"}}>
                                             Scadenza candidature: <b>{deadline}</b>
                                         </p>
-                                        <p style={{ fontSize: "0.85rem", color: "#2f4f4f" }}>
+                                        <p style={{fontSize: "0.85rem", color: "#2f4f4f"}}>
                                             Data premiazione: <b>{awardDate}</b>
                                         </p>
                                     </div>
 
                                     {/* ✅ Pulsanti */}
-                                    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginLeft: "1rem" }}>
+                                    <div style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        gap: "0.5rem",
+                                        marginLeft: "1rem"
+                                    }}>
                                         <button
                                             style={{
                                                 backgroundColor: "#1e7e34",
@@ -259,7 +267,10 @@ export default function AdminHome() {
                                                 padding: ".4rem .7rem", borderRadius: ".5rem",
                                                 border: "none", cursor: "pointer", fontWeight: "bold"
                                             }}
-                                            onClick={() => { setEditingEvent(event); setIsEventModalOpen(true); }}
+                                            onClick={() => {
+                                                setEditingEvent(event);
+                                                setIsEventModalOpen(true);
+                                            }}
                                         >
                                             Modifica
                                         </button>
@@ -296,9 +307,9 @@ export default function AdminHome() {
                                 </button>
 
                                 {expanded &&
-                                    <div style={{ marginTop: ".7rem" }}>
+                                    <div style={{marginTop: ".7rem"}}>
                                         {event.subscriptions.length === 0 ? (
-                                            <p style={{ fontSize: ".85rem" }}>Nessuna candidatura registrata.</p>
+                                            <p style={{fontSize: ".85rem"}}>Nessuna candidatura registrata.</p>
                                         ) : (
                                             event.subscriptions.map(sub => (
                                                 <div key={sub.id} style={{
@@ -308,16 +319,33 @@ export default function AdminHome() {
                                                     padding: ".6rem",
                                                     marginBottom: ".5rem",
                                                     display: "flex",
-                                                    justifyContent: "space-between"
+                                                    justifyContent: "space-between",
+                                                    alignItems: "center"
                                                 }}>
-                <span
-                    style={{
-                        color: sub.isValid ? "#2f4f4f" : "#ff4d4f",
-                        fontWeight: sub.isValid ? "normal" : "bold"
-                    }}
-                >
-                    🎬 {sub.movieName}
-                </span>
+                                                    <div style={{flex: 1}}>
+                                                        <span
+                                                            style={{
+                                                                color: sub.isValid ? "#2f4f4f" : "#ff4d4f",
+                                                                fontWeight: sub.isValid ? "normal" : "bold",
+                                                                marginRight: "1rem"
+                                                            }}
+                                                        >
+                                                            🎬 {sub.movieName}
+                                                        </span>
+
+                                                        {/* Indicatore Categoria */}
+                                                        <span style={{
+                                                            backgroundColor: "#daa520",
+                                                            color: "#2f4f4f",
+                                                            padding: "0.2rem 0.6rem",
+                                                            borderRadius: "0.5rem",
+                                                            fontSize: "0.75rem",
+                                                            fontWeight: "bold",
+                                                            marginLeft: "0.5rem"
+                                                        }}>
+                                                            {event.categories.find(cat => cat.id === sub.categoryId)?.name.toUpperCase() ?? "SENZA CATEGORIA"}
+                                                        </span>
+                                                    </div>
 
                                                     {sub.isValid ? (
                                                         <button
@@ -353,8 +381,8 @@ export default function AdminHome() {
                                                             fontWeight: "bold",
                                                             color: "#ff4d4f"
                                                         }}>
-                        ⏳ In attesa di modifica
-                    </span>
+                                                            ⏳ In attesa di modifica
+                                                        </span>
                                                     )}
                                                 </div>
                                             ))
@@ -368,7 +396,10 @@ export default function AdminHome() {
 
                 <EventModal
                     isOpen={isEventModalOpen}
-                    onClose={() => { setIsEventModalOpen(false); setEditingEvent(null); }}
+                    onClose={() => {
+                        setIsEventModalOpen(false);
+                        setEditingEvent(null);
+                    }}
                     onSubmit={handleSubmitEvent}
                     initialData={editingEvent ? {
                         name: editingEvent.name,
@@ -388,20 +419,23 @@ export default function AdminHome() {
 
     const renderCategoriesTab = () => (
         <>
-            <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+            <div style={{textAlign: "center", marginBottom: "1.5rem"}}>
                 <button
                     style={{
                         backgroundColor: "#daa520", color: "#2f4f4f",
                         padding: "0.5rem 1rem", borderRadius: "0.5rem",
                         border: "none", cursor: "pointer", fontWeight: "bold"
                     }}
-                    onClick={() => { setEditingCategory(null); setIsCategoryModalOpen(true); }}
+                    onClick={() => {
+                        setEditingCategory(null);
+                        setIsCategoryModalOpen(true);
+                    }}
                 >
                     Crea nuova categoria
                 </button>
             </div>
 
-            <ul style={{ listStyle: "none", padding: 0 }}>
+            <ul style={{listStyle: "none", padding: 0}}>
                 {categories.map(category => (
                     <li key={category.id} style={{
                         backgroundColor: "#f5f9f0",
@@ -414,11 +448,11 @@ export default function AdminHome() {
                         alignItems: "center"
                     }}>
                         <div>
-                            <strong style={{ color: "#2f4f4f" }}>{category.name}</strong>
-                            <p style={{ fontSize: ".85rem", color: "#2f4f4f" }}>{category.description}</p>
+                            <strong style={{color: "#2f4f4f"}}>{category.name}</strong>
+                            <p style={{fontSize: ".85rem", color: "#2f4f4f"}}>{category.description}</p>
                         </div>
 
-                        <div style={{ display: "flex", gap: ".5rem" }}>
+                        <div style={{display: "flex", gap: ".5rem"}}>
                             <button
                                 style={{
                                     backgroundColor: "#2f4f4f", color: "#daa520",
@@ -455,7 +489,10 @@ export default function AdminHome() {
 
             <CategoryModal
                 isOpen={isCategoryModalOpen}
-                onClose={() => { setIsCategoryModalOpen(false); setEditingCategory(null); }}
+                onClose={() => {
+                    setIsCategoryModalOpen(false);
+                    setEditingCategory(null);
+                }}
                 onSubmit={handleSubmitCategory}
                 initialName={editingCategory?.name}
                 initialDescription={editingCategory?.description}
@@ -465,7 +502,7 @@ export default function AdminHome() {
 
 
     return (
-        <div style={{ padding: "2rem", backgroundColor: "#d0f0c0", minHeight: "100vh", position: "relative" }}>
+        <div style={{padding: "2rem", backgroundColor: "#d0f0c0", minHeight: "100vh", position: "relative"}}>
 
             {/* ✅ Pulsante "Presenta candidatura" */}
             <button
@@ -495,10 +532,10 @@ export default function AdminHome() {
                 Logout
             </button>
 
-            <h1 style={{ textAlign: "center", color: "#daa520" }}>Pannello di controllo della Presidentessa</h1>
+            <h1 style={{textAlign: "center", color: "#daa520"}}>Pannello di controllo della Presidentessa</h1>
 
             {/* ✅ Tabs */}
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "2rem", gap: "1rem" }}>
+            <div style={{display: "flex", justifyContent: "center", marginBottom: "2rem", gap: "1rem"}}>
                 <button
                     style={{
                         backgroundColor: activeTab === "events" ? "#daa520" : "#f5f9f0",

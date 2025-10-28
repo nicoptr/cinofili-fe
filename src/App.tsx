@@ -7,10 +7,9 @@ import Register from "./pages/Register.tsx";
 import UserHome from "./pages/UserHome.tsx";
 
 function ProtectedRoute({ children, roleRequired }: { children: JSX.Element; roleRequired?: string }) {
-    const token = localStorage.getItem("token");
     const userProfile = localStorage.getItem("userProfile");
 
-    if (!token) return <Navigate to="/" replace />;
+    if (!localStorage.getItem("token")) return <Navigate to="/" replace />;
 
     if (!userProfile) return <Navigate to="/" replace />;
 

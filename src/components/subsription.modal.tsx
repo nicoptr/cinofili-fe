@@ -56,12 +56,14 @@ export default function SubscriptionModal({
                     .map(ec => ec.id)
                     .includes(c.id));
             const loggedUser = JSON.parse(localStorage.getItem("userProfile")!) as ApiEventParticipant;
+            console.log("filteredByEventCategories", filteredByEventCategories);
 
             const filteredByUserCategories = filteredByEventCategories
                 .filter(c => loggedUser.eventSpecification
                     ?.filter(es => es.eventId === eventId)
                     .map(es => es.categoryId)
                     .includes(c.id));
+            console.log("filteredByUserCategories", filteredByUserCategories);
 
             setCategories(filteredByUserCategories);
         }).catch(console.error);

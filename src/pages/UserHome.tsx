@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-    createSubscription,
+    createSubscription, deleteSubscription,
     fetchMySubscriptions,
     type Subscription,
     updateSubscription
@@ -241,7 +241,12 @@ export default function UserHome() {
                                             fontWeight: "bold",
                                             whiteSpace: "nowrap",
                                         }}
-                                        onClick={() => alert(`Elimina subscription ${sub.id} (TODO)`)}
+                                        onClick={async () => {
+                                            if (!confirm(`Eliminare '${sub.movieName}'?`)) return;
+                                            await deleteSubscription(sub.id);
+                                            setLoading(true);
+                                            fetchMySubscriptions().then(d => setSubscriptions(d.docs)).finally(() => setLoading(false));
+                                        }}
                                     >
                                         Elimina
                                     </button>
