@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../constants";
+import {logout} from "./auth.ts";
 
 export async function customFetch<T>(
     requiresAuth: boolean,
@@ -28,8 +29,7 @@ export async function customFetch<T>(
 
     // Se token scaduto o invalido → logout automatico
     if (response.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/";
+        logout();
         throw new Error("Token non valido o scaduto, redirect a login");
     }
 

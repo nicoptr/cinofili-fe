@@ -18,6 +18,7 @@ import EventModal from "../components/modals/event.modal.tsx";
 import { invalidate } from "../services/subscription.ts";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
+import {logout} from "../services/auth.ts";
 
 export default function AdminHome() {
     const navigate = useNavigate();
@@ -103,8 +104,7 @@ export default function AdminHome() {
 
     // ✅ Logout
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        navigate("/login");
+        logout();
     };
 
     const renderEventsTab = () => {

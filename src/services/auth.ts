@@ -9,6 +9,12 @@ export interface LoginResponse {
     token: string;
 }
 
+export function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userProfile");
+    window.location.href = "/login";
+}
+
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
     try {
         const response = await customFetch(false, `/auth/login`, {
