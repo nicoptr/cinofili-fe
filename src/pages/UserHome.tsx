@@ -25,7 +25,7 @@ export default function UserHome() {
         try {
             await getMe();
         } catch {
-            window.location.href = "/";
+            navigate("/login");
         }
     };
 

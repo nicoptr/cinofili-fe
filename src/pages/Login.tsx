@@ -10,7 +10,7 @@ export default function Login() {
 
     useEffect(() => {
         if (localStorage.getItem("userProfile") && localStorage.getItem("token")) {
-            navigate("/home");
+            navigate("/");
         }
     }, []);
 
@@ -25,7 +25,7 @@ export default function Login() {
             if (user?.roles![0].roleName === "GOD") {
                 navigate("/admin-home");
             } else {
-                navigate("/home");
+                navigate("/");
             }
         } catch (err: any) {
             alert(err.message || "Errore durante il login");

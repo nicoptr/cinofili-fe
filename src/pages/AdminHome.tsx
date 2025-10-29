@@ -104,7 +104,7 @@ export default function AdminHome() {
     // ✅ Logout
     const handleLogout = () => {
         localStorage.removeItem("token");
-        window.location.href = "/";
+        navigate("/login");
     };
 
     const renderEventsTab = () => {
@@ -348,7 +348,7 @@ export default function AdminHome() {
             </button>
 
             <button
-                onClick={() => navigate('/home')}
+                onClick={() => navigate('/')}
                 className="button button-candidature"
             >
                 Presenta candidatura

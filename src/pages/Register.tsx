@@ -32,7 +32,7 @@ export default function Register() {
 
             // Registrazione avvenuta: reindirizza al login (o mostra messaggio)
             alert("Registrazione avvenuta con successo. Effettua il login.");
-            navigate("/");
+            navigate("/login");
         } catch (err: any) {
             setError(err?.message || "Errore durante la registrazione");
         } finally {
@@ -147,7 +147,7 @@ export default function Register() {
 
                 <p style={smallTextStyle}>
                     Hai già un account?{" "}
-                    <Link to="/" style={{ color: "#daa520", fontWeight: "600" }}>
+                    <Link to="/login" style={{ color: "#daa520", fontWeight: "600" }}>
                         Accedi
                     </Link>
                 </p>

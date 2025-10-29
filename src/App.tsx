@@ -9,14 +9,14 @@ import UserHome from "./pages/UserHome.tsx";
 function ProtectedRoute({ children, roleRequired }: { children: JSX.Element; roleRequired?: string }) {
     const userProfile = localStorage.getItem("userProfile");
 
-    if (!localStorage.getItem("token")) return <Navigate to="/" replace />;
+    if (!localStorage.getItem("token")) return <Navigate to="/login" replace />;
 
-    if (!userProfile) return <Navigate to="/" replace />;
+    if (!userProfile) return <Navigate to="/login" replace />;
 
     const role = (JSON.parse(userProfile) as UserProfile).roles[0].roleName
 
     if (roleRequired && roleRequired !== role) {
-        return <Navigate to="/home" replace />;
+        return <Navigate to="/" replace />;
     }
 
     return children;
@@ -26,7 +26,7 @@ export default function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<Login />} />
+                <Route path="/login" element={<Login />} />
 
                 <Route path="/register" element={<Register />} />
 
@@ -40,7 +40,7 @@ export default function App() {
                 />
 
                 <Route
-                    path="/home"
+                    path="/"
                     element={
                         <ProtectedRoute>
                             <UserHome />
