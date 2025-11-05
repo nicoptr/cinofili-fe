@@ -134,15 +134,15 @@ export default function ProjectionPlanning() {
                                                 }}>
                                                     Programma
                                                 </button>}
-                                                <button className="button" onClick={async () => {
-                                                    try {
-                                                        console.log("")
-                                                    } catch (err: any) {
-                                                        alert("Errore durante la programmazione: " + err.message);
-                                                    }
-                                                }}>
-                                                    Avvia recensioni
-                                                </button>
+                                                {/*<button className="button" onClick={async () => {*/}
+                                                {/*    try {*/}
+                                                {/*        console.log("")*/}
+                                                {/*    } catch (err: any) {*/}
+                                                {/*        alert("Errore durante la programmazione: " + err.message);*/}
+                                                {/*    }*/}
+                                                {/*}}>*/}
+                                                {/*    Avvia recensioni*/}
+                                                {/*</button>*/}
                                             </div>
                                         </div>
                                     ) :
