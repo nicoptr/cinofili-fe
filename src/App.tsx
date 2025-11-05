@@ -5,6 +5,7 @@ import AdminHome from "./pages/AdminHome.tsx";
 import type {UserProfile} from "./services/auth.ts";
 import Register from "./pages/Register.tsx";
 import UserHome from "./pages/UserHome.tsx";
+import ProjectionPlanning from "./pages/ProjectionPlanning.tsx";
 
 function ProtectedRoute({ children, roleRequired }: { children: JSX.Element; roleRequired?: string }) {
     const userProfile = localStorage.getItem("userProfile");
@@ -27,9 +28,7 @@ export default function App() {
         <BrowserRouter>
             <Routes>
                 <Route path="/login" element={<Login />} />
-
                 <Route path="/register" element={<Register />} />
-
                 <Route
                     path="/admin-home"
                     element={
@@ -38,12 +37,19 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
-
                 <Route
                     path="/"
                     element={
                         <ProtectedRoute>
                             <UserHome />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/projection/:eventId"
+                    element={
+                        <ProtectedRoute>
+                            <ProjectionPlanning />
                         </ProtectedRoute>
                     }
                 />

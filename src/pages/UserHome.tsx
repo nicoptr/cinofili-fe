@@ -5,10 +5,11 @@ import {
     type Subscription,
     updateSubscription
 } from "../services/subscription";
-import {logout, type UserProfile} from "../services/auth.ts";
+import {type UserProfile} from "../services/auth.ts";
 import SubscriptionModal from "../components/modals/subsription.modal.tsx";
 import { useNavigate } from "react-router-dom";
-import "../App.css";  // Importa il file CSS
+import "../App.css";
+import {handleLogout} from "../services/utils.ts";  // Importa il file CSS
 
 export default function UserHome() {
     const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -19,10 +20,6 @@ export default function UserHome() {
     const [role, setRole] = useState("");
 
     const navigate = useNavigate();
-
-    const handleLogout = async () => {
-        logout();
-    };
 
     useEffect(() => {
         const userProfile = localStorage.getItem("userProfile");

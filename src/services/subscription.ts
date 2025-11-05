@@ -63,6 +63,15 @@ export async function updateSubscription(id: number, body: SubscriptionForm) {
     });
 }
 
+export async function updateProjectionDate(id: number, projectAt: string) {
+    return customFetch(true, `/subscriptions/plan/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+            projectAt
+        }),
+    });
+}
+
 export async function invalidate(subscriptionId: number): Promise<void> {
     await customFetch<void>(true, `/subscriptions/invalidate/${subscriptionId}`, {
         method: "PATCH",
@@ -76,4 +85,10 @@ export async function deleteSubscription(subscriptionId: number) {
         method: "DELETE",
         body: JSON.stringify({})
     });
+}
+
+export async function unlockNextSubscription(eventId: number): Promise<boolean> {
+    return customFetch<boolean>(true, `/subscriptions/next/${eventId}`, {
+        method: "GET",
+    })
 }

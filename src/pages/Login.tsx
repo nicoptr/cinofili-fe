@@ -27,6 +27,7 @@ export default function Login() {
             } else {
                 navigate("/");
             }
+
         } catch (err: any) {
             alert(err.message || "Errore durante il login");
         }

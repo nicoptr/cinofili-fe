@@ -1,4 +1,5 @@
 import {customFetch} from "./customFetch.ts";
+import type {EventDTO} from "../models/eventDTOs.ts";
 
 export interface ApiEventParticipant {
     id: number;
@@ -97,6 +98,16 @@ export async function createEvent(body: EventFormBody): Promise<ApiEvent> {
         throw err;
     }
 
+}
+
+export async function fetchEvent(id: number): Promise<EventDTO> {
+    return customFetch(
+        true,
+        `/events/${id}`,
+        {
+            method: "GET",
+        }
+    );
 }
 
 export async function updateEvent(id: number, data: EventFormBody) {

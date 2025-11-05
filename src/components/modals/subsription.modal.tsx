@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import './Modal.css';
 import {type ApiEvent, type ApiEventParticipant, fetchEvents} from "../../services/apiEvent.ts";
-import type {UserProfile} from "../../services/auth.ts";
+import {getMe, type UserProfile} from "../../services/auth.ts";
 import {type Category, fetchCategories} from "../../services/category.ts";
 import type {SubscriptionForm} from "../../services/subscription.ts";
 
@@ -21,17 +21,19 @@ export default function SubscriptionModal({
     const [movieName, setMovieName] = useState(initialData?.movieName ?? "");
     const [categoryId, setCategoryId] = useState(initialData?.categoryId ?? "");
     const [eventId, setEventId] = useState(initialData?.eventId ?? "");
-
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(JSON.parse(localStorage.getItem("userProfile") || ""));
     const [categories, setCategories] = useState<Category[]>([]);
     const [events, setEvents] = useState<ApiEvent[]>([]);
 
     useEffect(() => {
         if (!isOpen) return;
 
-        const loggedUser = JSON.parse(localStorage.getItem("userProfile")!) as UserProfile;
+        getMe().then((me) => {
+            setUserProfile(me);
+        })
 
         fetchEvents().then(r => {
-            const filteredEvents = r.docs.filter(e => e.participants.some(p => p.id === loggedUser?.id) && e.isActive);
+            const filteredEvents = r.docs.filter(e => e.participants.some(p => p.id === userProfile?.id) && e.isActive);
             setEvents(filteredEvents);
         }).catch(console.error);
 
@@ -55,7 +57,7 @@ export default function SubscriptionModal({
                     ?.categories
                     .map(ec => ec.id)
                     .includes(c.id));
-            const loggedUser = JSON.parse(localStorage.getItem("userProfile")!) as ApiEventParticipant;
+            const loggedUser = userProfile as ApiEventParticipant;
 
             const filteredByUserCategories = filteredByEventCategories
                 .filter(c => loggedUser.eventSpecification

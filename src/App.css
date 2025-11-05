@@ -145,6 +145,18 @@
     align-items: center;
 }
 
+.sub-card-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.sub-card-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
 .sub-card.invalid {
     border: 2px solid #ff4d4f;
 }
@@ -193,6 +205,37 @@
     font-weight: bold; /* In grassetto per dare maggiore importanza */
     margin-left: 0.5rem; /* Spazio tra il badge e gli altri elementi */
     margin-bottom: 0.2rem;
+}
+
+.spacer {
+    margin-bottom: 1rem;
+}
+
+.censored {
+    position: relative;
+    overflow: hidden;
+    background-color: #2f4f4f; /* base scura */
+    color: transparent; /* nasconde eventuale testo */
+    border-radius: 0.5rem;
+    user-select: none;
+}
+
+.censored::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+            45deg,
+            rgba(218, 165, 32, 0.2) 0px,
+            rgba(218, 165, 32, 0.2) 4px,
+            rgba(47, 79, 79, 0.4) 4px,
+            rgba(47, 79, 79, 0.4) 8px
+    );
+    mix-blend-mode: overlay;
+    opacity: 0.8;
+    filter: blur(2px);
+    z-index: 1;
+    pointer-events: none;
 }
 
 /* Media Queries per mobile */

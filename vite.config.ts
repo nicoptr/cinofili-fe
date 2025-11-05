@@ -8,7 +8,7 @@ export default defineConfig({
         host: true,       // very important
         port: 4000,
         strictPort: true,
-        allowedHosts: ['olevia-scripless-lindy.ngrok-free.dev']
+        allowedHosts: []
     }
 
 })

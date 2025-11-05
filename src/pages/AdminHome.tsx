@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import {
     type ApiEvent, createEvent,
     deleteEvent,
@@ -15,10 +15,11 @@ import {
 } from "../services/category";
 import CategoryModal from "../components/modals/category.modal.tsx";
 import EventModal from "../components/modals/event.modal.tsx";
-import { invalidate } from "../services/subscription.ts";
-import { useNavigate } from "react-router-dom";
+import {invalidate} from "../services/subscription.ts";
+import {useNavigate} from "react-router-dom";
 import "../App.css";
-import {logout} from "../services/auth.ts";
+import {handleLogout} from "../services/utils.ts";
+import {DateTime} from "luxon";
 
 export default function AdminHome() {
     const navigate = useNavigate();
@@ -71,9 +72,9 @@ export default function AdminHome() {
     const handleSubmitCategory = async (name: string, description: string) => {
         try {
             if (editingCategory) {
-                await updateCategory(editingCategory.id, { name, description });
+                await updateCategory(editingCategory.id, {name, description});
             } else {
-                await createCategory({ name, description });
+                await createCategory({name, description});
             }
 
             setIsCategoryModalOpen(false);
@@ -102,14 +103,9 @@ export default function AdminHome() {
         }
     };
 
-    // ✅ Logout
-    const handleLogout = () => {
-        logout();
-    };
-
     const renderEventsTab = () => {
-        if (loading) return <p style={{ textAlign: "center" }}>Caricamento eventi...</p>;
-        if (error) return <p style={{ textAlign: "center", color: "red" }}>Errore: {error}</p>;
+        if (loading) return <p style={{textAlign: "center"}}>Caricamento eventi...</p>;
+        if (error) return <p style={{textAlign: "center", color: "red"}}>Errore: {error}</p>;
 
         return (
             <>
@@ -150,36 +146,48 @@ export default function AdminHome() {
                                     <p>🏆​ Data premiazione: <b>{awardDate}</b></p>
 
                                     <div className="card-progress-bar">
-                                        <div className="bar" style={{ width: `${progress}%` }} />
+                                        <div className="bar" style={{width: `${progress}%`}}/>
                                     </div>
                                     <p>{current}/{max} partecipanti iscritti</p>
 
                                     <div className="card-progress-bar">
-                                        <div className="bar" style={{ width: `${subsProgress}%` }} />
+                                        <div className="bar" style={{width: `${subsProgress}%`}}/>
                                     </div>
                                     <p>{event.subscriptions?.length || 0}/{max} candidature inviate</p>
                                 </div>
 
                                 <div className="card-actions">
-                                    <button
-                                        className="button"
-                                        onClick={async () => {
-                                            if (!confirm("Confermando questa operazione tutti i partecipanti inseriti riceveranno un'email di invito a presentare una candidatura. ...")) return;
-                                            try {
-                                                await inviteParticipants(event.id);
-
-                                                setLoading(true);
-                                                fetchEvents()
-                                                    .then(data => setEvents(data.docs))
-                                                    .catch(err => setError(err.message))
-                                                    .finally(() => setLoading(false));
-                                            } catch (err: any) {
-                                                alert("Errore durante l'invalidazione: " + err.message);
-                                            }
-                                        }}
-                                    >
-                                        Invita partecipanti
-                                    </button>
+                                    {DateTime.fromISO(event.subscriptionExpiresAt) > DateTime.local() ?
+                                        (
+                                            <button
+                                                className="button"
+                                                onClick={async () => {
+                                                    if (!confirm("Confermando questa operazione tutti i partecipanti inseriti riceveranno un'email di invito a presentare una candidatura. ...")) return;
+                                                    try {
+                                                        await inviteParticipants(event.id);
+                                                        setLoading(true);
+                                                        fetchEvents()
+                                                            .then(data => setEvents(data.docs))
+                                                            .catch(err => setError(err.message))
+                                                            .finally(() => setLoading(false));
+                                                    } catch (err: any) {
+                                                        alert("Errore durante l'invito: " + err.message);
+                                                    }
+                                                }}
+                                            >
+                                                Invita partecipanti
+                                            </button>
+                                        )
+                                        :
+                                        (
+                                            <button
+                                                className="button"
+                                                onClick={() => navigate(`/projection/${event.id}`)}
+                                            >
+                                                Vai alla programmazione
+                                            </button>
+                                        )
+                                    }
                                     <button
                                         className="button"
                                         onClick={() => {
@@ -212,10 +220,11 @@ export default function AdminHome() {
                                 {expanded &&
                                     <div>
                                         {event.subscriptions.length === 0 ? (
-                                            <p style={{ fontSize: ".85rem" }}>Nessuna candidatura registrata.</p>
+                                            <p style={{fontSize: ".85rem"}}>Nessuna candidatura registrata.</p>
                                         ) : (
                                             event.subscriptions.map(sub => (
-                                                <div key={sub.id} className={`sub-card ${sub.isValid ? "" : "invalid"}`}>
+                                                <div key={sub.id}
+                                                     className={`sub-card ${sub.isValid ? "" : "invalid"}`}>
                                                     <div>
                                                         <span className="movie-title">📽️​ {sub.movieName}</span>
                                                         <div className="category-tag">
