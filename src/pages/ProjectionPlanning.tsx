@@ -3,7 +3,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {fetchEvent} from "../services/apiEvent.ts";
 import type {EventDTO, SubscriptionInEventDTO} from "../models/eventDTOs.ts";
 import {handleLogout} from "../services/utils.ts";
-import {unlockNextSubscription, updateProjectionDate} from "../services/subscription.ts";
+import {unlockNextSubscription, updateProjectionPlanning} from "../services/subscription.ts";
 import {DateTime} from "luxon";
 import PlanningModal from "../components/modals/subscription.planning.modal.tsx";
 
@@ -26,11 +26,11 @@ export default function ProjectionPlanning() {
         });
     }, [eventId]);
 
-    const handleSubmitPlanning = async (projectAt: string) => {
+    const handleSubmitPlanning = async (projectAt: string, location: string) => {
         try {
             console.log("projeto", projectAt);
             console.log("sub", editingSub);
-            if (editingSub) await updateProjectionDate(editingSub.id, projectAt);
+            if (editingSub) await updateProjectionPlanning(editingSub.id, projectAt, location);
 
             setIsPlanningModalOpen(false);
             setEditingSub(null);
@@ -59,7 +59,7 @@ export default function ProjectionPlanning() {
                     Pannello di controllo
                 </button>
 
-                <h1 className="admin-home-title">Le tue candidature</h1>
+                <h1 className="admin-home-title">Programmazione</h1>
 
                 <div className="card-container">
                     <div className="card" key={eventId}>
@@ -82,7 +82,8 @@ export default function ProjectionPlanning() {
                                 <div className="bar"
                                      style={{width: `${Math.min(((event?.subscriptions.filter(s => s.isReadyForProjection).length ?? 0) / (event?.subscriptions.length ?? 1)) * 100, 100)}%`}}/>
                             </div>
-                            <p>{event?.subscriptions.filter(s => s.isReadyForProjection).length}/{event?.subscriptions.length} film svelati</p>
+                            <p>{event?.subscriptions.filter(s => s.isReadyForProjection).length}/{event?.subscriptions.length} film
+                                svelati</p>
 
                         </div>
 
@@ -111,7 +112,7 @@ export default function ProjectionPlanning() {
                             {event?.subscriptions.sort((a, b) => a.projectionOrder - b.projectionOrder).map(sub => (
                                 (sub.isReadyForProjection ? (
                                         <div key={sub.id}
-                                            className={`sub-card ${sub.projectAt ? "" : "invalid"}`}>
+                                             className={`sub-card ${sub.projectAt ? "" : "invalid"}`}>
                                             <div className="sub-card-left">
                                                 <span className="movie-title">📽️​ {sub.movieName}</span>
                                                 <div className="category-tag">
@@ -120,7 +121,14 @@ export default function ProjectionPlanning() {
                                                 <div>
                                                     {
                                                         sub.projectAt ? (
-                                                                <span>Data di proiezione: {new Date(sub.projectAt).toLocaleDateString("it-IT")}</span>)
+                                                                <span>
+                                                                    Data di proiezione: {new Date(sub.projectAt).toLocaleDateString("it-IT")}{" "}
+                                                                    | alle ore: {new Date(sub.projectAt).toLocaleTimeString("it-IT", {
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit"
+                                                                })}{" "}
+                                                                    | dove: {sub.location || <strong>DA DEFINIRE</strong>}
+                                                                </span>)
                                                             :
                                                             (
                                                                 <span>Data di proiezione: <strong>DA DEFINIRE</strong></span>)
@@ -128,12 +136,13 @@ export default function ProjectionPlanning() {
                                                 </div>
                                             </div>
                                             <div className="sub-card-right">
-                                                {(!sub.projectAt || (DateTime.fromISO(sub.projectAt ?? "") > DateTime.local())) && <button className="button" onClick={async () => {
-                                                    setEditingSub(sub);
-                                                    setIsPlanningModalOpen(true);
-                                                }}>
-                                                    Programma
-                                                </button>}
+                                                {(!sub.projectAt || (DateTime.fromISO(sub.projectAt ?? "") > DateTime.local())) &&
+                                                    <button className="button" onClick={async () => {
+                                                        setEditingSub(sub);
+                                                        setIsPlanningModalOpen(true);
+                                                    }}>
+                                                        Programma
+                                                    </button>}
                                                 {/*<button className="button" onClick={async () => {*/}
                                                 {/*    try {*/}
                                                 {/*        console.log("")*/}
@@ -168,6 +177,7 @@ export default function ProjectionPlanning() {
                 onSubmit={handleSubmitPlanning}
                 initialData={{
                     projectAt: editingSub?.projectAt || undefined,
+                    location: editingSub?.location || "",
                 }}
             />
         </>

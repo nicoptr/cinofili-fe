@@ -232,22 +232,28 @@ export default function AdminHome() {
                                                         </div>
                                                     </div>
                                                     {sub.isValid ? (
-                                                        <button className="button" onClick={async () => {
-                                                            if (!confirm(`Vuoi davvero invalidare la candidatura "${sub.movieName}"?`)) return;
-                                                            try {
-                                                                await invalidate(sub.id);
+                                                        (
+                                                            DateTime.fromISO(event.subscriptionExpiresAt) > DateTime.local() ? (
+                                                                <button className="button" onClick={async () => {
+                                                                    if (!confirm(`Vuoi davvero invalidare la candidatura "${sub.movieName}"?`)) return;
+                                                                    try {
+                                                                        await invalidate(sub.id);
 
-                                                                setLoading(true);
-                                                                fetchEvents()
-                                                                    .then(data => setEvents(data.docs))
-                                                                    .catch(err => setError(err.message))
-                                                                    .finally(() => setLoading(false));
-                                                            } catch (err: any) {
-                                                                alert("Errore durante l'invalidazione: " + err.message);
-                                                            }
-                                                        }}>
-                                                            Invalida
-                                                        </button>
+                                                                        setLoading(true);
+                                                                        fetchEvents()
+                                                                            .then(data => setEvents(data.docs))
+                                                                            .catch(err => setError(err.message))
+                                                                            .finally(() => setLoading(false));
+                                                                    } catch (err: any) {
+                                                                        alert("Errore durante l'invalidazione: " + err.message);
+                                                                    }
+                                                                }}>
+                                                                    Invalida
+                                                                </button>
+                                                            ) : (
+                                                                <span className="valid-text">​✔️ Verificato</span>
+                                                            )
+                                                        )
                                                     ) : (
                                                         <span className="invalid-text">⏳ In attesa di modifica</span>
                                                     )}

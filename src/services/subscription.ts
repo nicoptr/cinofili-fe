@@ -63,11 +63,12 @@ export async function updateSubscription(id: number, body: SubscriptionForm) {
     });
 }
 
-export async function updateProjectionDate(id: number, projectAt: string) {
+export async function updateProjectionPlanning(id: number, projectAt: string, location: string) {
     return customFetch(true, `/subscriptions/plan/${id}`, {
         method: "PATCH",
         body: JSON.stringify({
-            projectAt
+            projectAt,
+            location,
         }),
     });
 }

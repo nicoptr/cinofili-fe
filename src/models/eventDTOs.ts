@@ -41,6 +41,7 @@ export interface SubscriptionInEventDTO {
     isReadyForProjection: boolean;
     isReadyForRating: boolean;
     projectAt: string | null;
+    location: string | null;
     projectionOrder: number;
     categoryId: number;
     eventId: number;
