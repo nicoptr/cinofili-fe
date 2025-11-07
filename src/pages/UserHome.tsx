@@ -93,9 +93,6 @@ export default function UserHome() {
 
             <ul className="card-container">
                 {subscriptions.map(sub => {
-                    const total = sub.event?.numberOfParticipants ?? 1;
-                    const currentValids = sub.isValid ? 1 : 0;
-                    const percentage = Math.min((currentValids / total) * 100, 100);
 
                     return (
                         <li className="card" key={sub.id}>
@@ -115,13 +112,6 @@ export default function UserHome() {
                                 <p>🏆​ Data premiazione: <b>{sub.event?.expiresAt
                                     ? new Date(sub.event.expiresAt).toLocaleDateString("it-IT")
                                     : "Non definita"}</b></p>
-
-                                {/* Barra di avanzamento */}
-                                <div className="card-progress-bar">
-                                    <div className="bar" style={{ width: `${percentage}%` }} />
-                                </div>
-                                <p>Candidature valide: <b>{currentValids}/{total}</b> ({Math.round(percentage)}%)</p>
-
                             </div>
 
                             <div className="card-actions">
