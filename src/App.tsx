@@ -16,9 +16,7 @@ function ProtectedRoute({ children, roleRequired }: { children: JSX.Element; rol
     if (!userProfile) return <Navigate to="/login" replace />;
 
     getMe().then(res => {
-        console.log("Role required: ", roleRequired);
         if (roleRequired && roleRequired !== res.roles[0].roleName) {
-            console.log("Actual role", res.roles[0].roleName);
             window.location.href = "/login";
         }
     });

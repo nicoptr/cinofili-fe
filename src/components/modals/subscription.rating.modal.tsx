@@ -25,11 +25,11 @@ export default function RatingModal({
     const [answers, setAnswers] = useState<Record<number, number>>({});
 
     useEffect(() => {
-        if (isOpen) {
-            fetchFormByEventId(eventId)
-                .then(res => setEvent(res))
-                .catch(e => console.error(e));
-        }
+        if (!isOpen) return;
+
+        fetchFormByEventId(eventId)
+            .then(res => setEvent(res))
+            .catch(e => console.error(e));
     }, [isOpen]);
 
     useEffect(() => {
@@ -42,7 +42,6 @@ export default function RatingModal({
         });
 
         setAnswers(initial);
-
     }, [event]);
 
 
@@ -50,7 +49,10 @@ export default function RatingModal({
         setAnswers(prev => ({ ...prev, [questionId]: value }));
     };
 
-    const handleConfirm = () => {
+    const handleSubmit = (e: React.FormEvent) => {
+
+        e.preventDefault();
+
         const dto: AnswerFormDTO = {
             answers: Object.entries(answers).map(([id, value]) => ({
                 questionId: Number(id),
@@ -71,7 +73,7 @@ export default function RatingModal({
                     Assegna un voto da <strong>0</strong> a <strong>100</strong> per ogni categoria.
                 </p>
 
-                <form>
+                <form onSubmit={handleSubmit}>
                     {event?.awards
                         .sort((a, b) => a.award.question.ordinal - b.award.question.ordinal)
                         .map(a => {
@@ -130,7 +132,6 @@ export default function RatingModal({
                         <button
                             type="submit"
                             className="modal-button modal-button-submit"
-                            onClick={handleConfirm}
                         >
                             Conferma
                         </button>

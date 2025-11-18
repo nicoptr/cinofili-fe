@@ -16,11 +16,12 @@ export async function customFetch<T>(
         }
     }
 
-    // Costruisci headers di base
     const headers = new Headers(options.headers || {});
     headers.set("Accept", "*/*");
     headers.set("Content-Type", "application/json");
-    requiresAuth && headers.set("Authorization", `Bearer ${token}`);
+    if (requiresAuth) {
+        headers.set("Authorization", `Bearer ${token}`);
+    }
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,

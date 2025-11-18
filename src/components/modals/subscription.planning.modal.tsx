@@ -30,10 +30,8 @@ export default function PlanningModal({
     useEffect(() => {
         if (!isOpen) return;
         setDate(initialData?.projectAt ? initialData?.projectAt.split("T")[0] : "");
-        console.log("initialData?.projectAt: ", initialData?.projectAt)
         setTime(initialData?.projectAt ? formatItaliaTimeStringFromString(initialData?.projectAt) : "");
         setLocation(initialData?.location || "");
-        console.log("time: ", time)
     }, [isOpen]);
 
 

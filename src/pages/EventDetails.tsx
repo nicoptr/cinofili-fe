@@ -42,6 +42,7 @@ export default function EventDetails() {
         } catch (err: any) {
             alert("Errore: " + err.message);
         }
+
     };
 
     const renderVoteButton = (sub: SubscriptionInEventDTO) => {

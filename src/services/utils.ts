@@ -10,12 +10,10 @@ export const formatItaliaDateString = (date: Date | undefined | null): string =>
 }
 
 export const formatItaliaTimeStringFromString = (date: string | undefined | null): string => {
-    console.log("received date: ", date)
     const result = new Date(date ?? "").toLocaleTimeString("it-IT", {
         hour: "2-digit",
         minute: "2-digit"
     });
-    console.log("result: ", result)
     return result;
 
 }
