@@ -124,6 +124,85 @@
     margin-right: 0.5rem;
 }
 
+/* Contenitore singola domanda */
+.rating-question-block {
+    background-color: #ffffff;
+    border: 1px solid #daa520;
+    padding: 1rem;
+    border-radius: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+/* Label della domanda */
+.rating-question-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #2f4f4f;
+    font-size: 1rem;
+    justify-content: center;
+}
+
+.rating-award-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #2f4f4f;
+    font-size: 1.25rem;
+}
+
+.rating-description-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #2f4f4f;
+    font-size: 0.95rem;
+    font-weight: normal;
+}
+
+/* Numero della domanda (1., 2., ecc.) */
+.rating-question-number {
+    font-weight: bold;
+    color: #daa520;
+    font-size: 1rem;
+}
+
+/* Layout slider + input number */
+.rating-input-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* Slider */
+.rating-slider {
+    flex: 1;
+    appearance: none;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    outline: none;
+    border: 1px solid #daa520;
+}
+
+.rating-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #daa520;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #2f4f4f;
+}
+
+/* Input numerico */
+.rating-number-input {
+    width: 70px;
+    text-align: center;
+}
+
+
 /* Media Queries per Mobile */
 @media (max-width: 768px) {
     .modal-container {

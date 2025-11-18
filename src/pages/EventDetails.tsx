@@ -3,15 +3,16 @@ import {useNavigate, useParams} from "react-router-dom";
 import {fetchEvent} from "../services/apiEvent.ts";
 import type {EventDTO, SubscriptionInEventDTO} from "../models/eventDTOs.ts";
 import {handleLogout} from "../services/utils.ts";
-import {updateProjectionPlanning} from "../services/subscription.ts";
-import PlanningModal from "../components/modals/subscription.planning.modal.tsx";
 import {getMe, type UserProfile} from "../services/auth.ts";
+import RatingModal from "../components/modals/subscription.rating.modal.tsx";
+import type {AnswerFormDTO} from "../models/AnswerFormDTO.ts";
+import {rateSubscription} from "../services/answer.ts";
 
 export default function EventDetails() {
     const {eventId} = useParams<{ eventId: string }>();
     const [error,] = useState<string | null>(null);
-    const [isPlanningModalOpen, setIsPlanningModalOpen] = useState(false);
-    const [editingSub, setEditingSub] = useState<SubscriptionInEventDTO | null>(null);
+    const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+    const [ratingSub, setRatingSub] = useState<SubscriptionInEventDTO | null>(null);
 
     const [loggedUser, setLoggedUser] = useState<UserProfile | null>(null);
 
@@ -31,14 +32,12 @@ export default function EventDetails() {
 
     }, [eventId]);
 
-    const handleSubmitPlanning = async (projectAt: string, location: string) => {
+    const handleSubmitRating = async (subId: number, dto: AnswerFormDTO) => {
         try {
-            console.log("projeto", projectAt);
-            console.log("sub", editingSub);
-            if (editingSub) await updateProjectionPlanning(editingSub.id, projectAt, location);
+            if (ratingSub) await rateSubscription(subId, dto);
 
-            setIsPlanningModalOpen(false);
-            setEditingSub(null);
+            setIsRatingModalOpen(false);
+            setRatingSub(null);
             fetchEvent(+eventId!).then(data => setEvent(data));
         } catch (err: any) {
             alert("Errore: " + err.message);
@@ -138,8 +137,8 @@ export default function EventDetails() {
                                             <div className="sub-card-right">
                                                 {(renderVoteButton(sub)) &&
                                                     <button className="button" onClick={async () => {
-                                                        setEditingSub(sub);
-                                                        setIsPlanningModalOpen(true);
+                                                        setRatingSub(sub);
+                                                        setIsRatingModalOpen(true);
                                                     }}>
                                                         Vota
                                                     </button>}
@@ -159,17 +158,16 @@ export default function EventDetails() {
                     </div>
                 </div>
             </div>
-            <PlanningModal
-                isOpen={isPlanningModalOpen}
+            <RatingModal
+                isOpen={isRatingModalOpen}
                 onClose={() => {
-                    setIsPlanningModalOpen(false);
-                    setEditingSub(null);
+                    setIsRatingModalOpen(false);
+                    setRatingSub(null);
                 }}
-                onSubmit={handleSubmitPlanning}
-                initialData={{
-                    projectAt: editingSub?.projectAt || undefined,
-                    location: editingSub?.location || "",
-                }}
+                eventId={+eventId!}
+                subId={ratingSub?.id ?? 0}
+                movieName={ratingSub?.movieName ?? ""}
+                onSubmit={handleSubmitRating}
             />
         </>
     )

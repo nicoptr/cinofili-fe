@@ -28,8 +28,6 @@ export default function ProjectionPlanning() {
 
     const handleSubmitPlanning = async (projectAt: string, location: string) => {
         try {
-            console.log("projeto", projectAt);
-            console.log("sub", editingSub);
             if (editingSub) await updateProjectionPlanning(editingSub.id, projectAt, location);
 
             setIsPlanningModalOpen(false);

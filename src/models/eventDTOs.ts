@@ -9,8 +9,38 @@ export interface EventDTO {
     categories: CategoryInEventDTO[];
     participants: ParticipantInEventDTO[];
     subscriptions: SubscriptionInEventDTO[];
+    awards: AwardInEventDTO[];
     createdAt?: string;
     updatedAt?: string;
+}
+
+export interface AwardInEventDTO {
+    id: number;
+    awardId: number;
+    eventId: number;
+    winnerId: number | null;
+    createdAt: string;
+    updatedAt: string;
+    award: AwardDTO;
+}
+
+export interface AwardDTO {
+    id: number;
+    name: string;
+    description: string;
+    questionId: number;
+    createdAt: string;
+    updatedAt: string;
+    question: AwardQuestionDTO;
+}
+
+export interface AwardQuestionDTO {
+    id: number;
+    ordinal: number;
+    text: string;
+    awardId: number;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface CategoryInEventDTO {

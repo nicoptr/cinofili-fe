@@ -110,6 +110,16 @@ export async function fetchEvent(id: number): Promise<EventDTO> {
     );
 }
 
+export async function fetchFormByEventId(id: number): Promise<EventDTO> {
+    return customFetch(
+        true,
+        `/events/form/${id}`,
+        {
+            method: "GET",
+        }
+    );
+}
+
 export async function updateEvent(id: number, data: EventFormBody) {
     return customFetch(
         true,
