@@ -9,7 +9,8 @@ import {type UserProfile} from "../services/auth.ts";
 import SubscriptionModal from "../components/modals/subsription.modal.tsx";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
-import {handleLogout} from "../services/utils.ts";  // Importa il file CSS
+import {handleLogout} from "../services/utils.ts";
+import {DateTime} from "luxon";  // Importa il file CSS
 
 export default function UserHome() {
     const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -115,15 +116,28 @@ export default function UserHome() {
                             </div>
 
                             <div className="card-actions">
-                                <button
-                                    className="button"
-                                    onClick={() => {
-                                        setEditingSubscription(sub);
-                                        setIsSubscriptionModalOpen(true);
-                                    }}
-                                >
-                                    Modifica
-                                </button>
+                                {
+                                    (DateTime.fromISO(sub.event?.subscriptionExpiresAt ?? "") > DateTime.local()) ? (
+                                        <button
+                                            className="button"
+                                            onClick={() => {
+                                                setEditingSubscription(sub);
+                                                setIsSubscriptionModalOpen(true);
+                                            }}
+                                        >
+                                            Modifica
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="button"
+                                            onClick={() => {
+                                                navigate(`/event/${sub.eventId}`);
+                                            }}
+                                        >
+                                            Dettagli Evento
+                                        </button>
+                                    )
+                                }
 
                                 <button
                                     className="button"

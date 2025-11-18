@@ -366,7 +366,7 @@ export default function AdminHome() {
                 onClick={() => navigate('/')}
                 className="button button-candidature"
             >
-                Presenta candidatura
+                Pannello utente
             </button>
 
             <h1 className="admin-home-title">Pannello di controllo della Presidentessa</h1>

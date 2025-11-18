@@ -6,6 +6,7 @@ import {getMe} from "./services/auth.ts";
 import Register from "./pages/Register.tsx";
 import UserHome from "./pages/UserHome.tsx";
 import ProjectionPlanning from "./pages/ProjectionPlanning.tsx";
+import EventDetails from "./pages/EventDetails.tsx";
 
 function ProtectedRoute({ children, roleRequired }: { children: JSX.Element; roleRequired?: string }) {
     const userProfile = localStorage.getItem("userProfile");
@@ -21,12 +22,6 @@ function ProtectedRoute({ children, roleRequired }: { children: JSX.Element; rol
             window.location.href = "/login";
         }
     });
-
-    // const role = (me as UserProfile).roles[0].roleName
-    //
-    // if (roleRequired && roleRequired !== role) {
-    //     return <Navigate to="/" replace />;
-    // }
 
     return children;
 }
@@ -56,8 +51,16 @@ export default function App() {
                 <Route
                     path="/projection/:eventId"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute roleRequired="GOD">
                             <ProjectionPlanning />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/event/:eventId"
+                    element={
+                        <ProtectedRoute>
+                            <EventDetails />
                         </ProtectedRoute>
                     }
                 />
