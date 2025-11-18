@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import type {JSX} from "react";
 import Login from "./pages/Login.tsx";
 import AdminHome from "./pages/AdminHome.tsx";
-import type {UserProfile} from "./services/auth.ts";
+import {getMe} from "./services/auth.ts";
 import Register from "./pages/Register.tsx";
 import UserHome from "./pages/UserHome.tsx";
 import ProjectionPlanning from "./pages/ProjectionPlanning.tsx";
@@ -14,11 +14,19 @@ function ProtectedRoute({ children, roleRequired }: { children: JSX.Element; rol
 
     if (!userProfile) return <Navigate to="/login" replace />;
 
-    const role = (JSON.parse(userProfile) as UserProfile).roles[0].roleName
+    getMe().then(res => {
+        console.log("Role required: ", roleRequired);
+        if (roleRequired && roleRequired !== res.roles[0].roleName) {
+            console.log("Actual role", res.roles[0].roleName);
+            window.location.href = "/login";
+        }
+    });
 
-    if (roleRequired && roleRequired !== role) {
-        return <Navigate to="/" replace />;
-    }
+    // const role = (me as UserProfile).roles[0].roleName
+    //
+    // if (roleRequired && roleRequired !== role) {
+    //     return <Navigate to="/" replace />;
+    // }
 
     return children;
 }
