@@ -139,7 +139,8 @@ export default function UserHome() {
                                     )
                                 }
 
-                                <button
+                                { (DateTime.fromISO(sub.event?.subscriptionExpiresAt ?? "") > DateTime.local()) &&
+                                    <button
                                     className="button"
                                     onClick={async () => {
                                         if (!confirm(`Eliminare '${sub.movieName}'?`)) return;
@@ -149,7 +150,7 @@ export default function UserHome() {
                                     }}
                                 >
                                     Elimina
-                                </button>
+                                </button>}
                             </div>
 
                         </li>

@@ -36,7 +36,6 @@ export default function AdminHome() {
     const [isEventModalOpen, setIsEventModalOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<ApiEvent | null>(null);
 
-    // ⬇️ Per toggle candidatura evento
     const [expandedEvents, setExpandedEvents] = useState<Record<number, boolean>>({});
 
     const toggleExpand = (eventId: number) => {
@@ -46,7 +45,6 @@ export default function AdminHome() {
         }));
     };
 
-    // ✅ Fetch eventi
     useEffect(() => {
         if (activeTab !== "events") return;
         setLoading(true);
@@ -57,7 +55,6 @@ export default function AdminHome() {
             .finally(() => setLoading(false));
     }, [activeTab]);
 
-    // ✅ Fetch categorie
     useEffect(() => {
         if (activeTab !== "categories") return;
         setLoading(true);
@@ -68,7 +65,6 @@ export default function AdminHome() {
             .finally(() => setLoading(false));
     }, [activeTab]);
 
-    // ✅ Submit Categoria (create/update)
     const handleSubmitCategory = async (name: string, description: string) => {
         try {
             if (editingCategory) {
@@ -87,7 +83,6 @@ export default function AdminHome() {
         }
     };
 
-    // ✅ Submit Evento (create/update)
     const handleSubmitEvent = async (data: EventFormBody) => {
         try {
             if (editingEvent) await updateEvent(editingEvent.id, data);
@@ -366,7 +361,7 @@ export default function AdminHome() {
                 onClick={() => navigate('/')}
                 className="button button-candidature"
             >
-                Pannello utente
+                Le mie candidature
             </button>
 
             <h1 className="admin-home-title">Pannello di controllo della Presidentessa</h1>

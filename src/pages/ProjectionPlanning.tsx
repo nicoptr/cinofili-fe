@@ -57,6 +57,13 @@ export default function ProjectionPlanning() {
                     Pannello di controllo
                 </button>
 
+                <button
+                    onClick={() => navigate('/')}
+                    className="button button-candidature"
+                >
+                    Le mie candidature
+                </button>
+
                 <h1 className="admin-home-title">Programmazione</h1>
 
                 <div className="card-container">
