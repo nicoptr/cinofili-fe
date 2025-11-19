@@ -11,7 +11,7 @@ import {
 import {DateTime} from "luxon";
 import PlanningModal from "../components/modals/subscription.planning.modal.tsx";
 import type {AnswerDTO} from "../models/AnswerFormDTO.ts";
-import {fetchAnswers} from "../services/answer.ts";
+import {fetchAllAnswers} from "../services/answer.ts";
 
 export default function ProjectionPlanning() {
     const {eventId} = useParams<{ eventId: string }>();
@@ -41,7 +41,7 @@ export default function ProjectionPlanning() {
         }
 
         event.subscriptions.forEach(subscription => {
-            fetchAnswers(subscription.id).then(res => {
+            fetchAllAnswers(subscription.id).then(res => {
                 setSubsAnswers(prevState => [...prevState, ...res]);
             });
         })
@@ -71,7 +71,7 @@ export default function ProjectionPlanning() {
             )
         } else {
             const voted = new Set(subsAnswers.map((ans) => ans.userId)).size;
-            const voters = event?.numberOfParticipants;
+            const voters = (event?.numberOfParticipants || 1) - 1;
             const renderButton = voters !== voted;
             const classNameToUse = voted === 0 ? "info-text-error" : (voted === voters ? "info-text-valid" : "info-text-warning");
 

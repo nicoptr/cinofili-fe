@@ -9,8 +9,14 @@ export async function rateSubscription(subId: number, dto: AnswerFormDTO) {
     });
 }
 
-export async function fetchAnswers(subId: number): Promise<AnswerDTO[]> {
+export async function fetchPersonalAnswers(subId: number): Promise<AnswerDTO[]> {
     return await customFetch(true, `/answers/rate/${subId}`, {
+        method: "GET",
+    });
+}
+
+export async function fetchAllAnswers(subId: number): Promise<AnswerDTO[]> {
+    return await customFetch(true, `/answers/rate/all/${subId}`, {
         method: "GET",
     });
 }

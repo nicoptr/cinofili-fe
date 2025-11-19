@@ -6,7 +6,7 @@ import {handleLogout} from "../services/utils.ts";
 import {getMe, type UserProfile} from "../services/auth.ts";
 import RatingModal from "../components/modals/subscription.rating.modal.tsx";
 import type {AnswerDTO, AnswerFormDTO} from "../models/AnswerFormDTO.ts";
-import {fetchAnswers, rateSubscription} from "../services/answer.ts";
+import {fetchPersonalAnswers, rateSubscription} from "../services/answer.ts";
 import MyAnswersModal from "../components/modals/subscription.my-answers.modal.tsx";
 
 export default function EventDetails() {
@@ -44,7 +44,7 @@ export default function EventDetails() {
         }
 
         event.subscriptions.forEach(subscription => {
-            fetchAnswers(subscription.id).then(res => {
+            fetchPersonalAnswers(subscription.id).then(res => {
                 setSubsAnswers(prevState => [...prevState, ...res]);
             });
         })
