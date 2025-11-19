@@ -144,8 +144,9 @@ export default function EventDetails() {
                                 <div className="bar"
                                      style={{width: `${Math.min(((event?.subscriptions.filter(s => s.isReadyForProjection).length ?? 0) / (event?.subscriptions.length ?? 1)) * 100, 100)}%`}}/>
                             </div>
-                            <p>{event?.subscriptions.filter(s => s.isReadyForProjection).length}/{event?.subscriptions.length} film
-                                svelati</p>
+                            <p>
+                                {event?.subscriptions.filter(s => s.isReadyForProjection).length}/{event?.numberOfParticipants} film svelati
+                            </p>
 
                         </div>
 
