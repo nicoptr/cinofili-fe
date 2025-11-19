@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {fetchFormByEventId} from "../../services/apiEvent.ts";
-import type {EventDTO} from "../../models/eventDTOs.ts";
+import type {EventDTO} from "../../models/EventDTO.ts";
 import type {AnswerFormDTO} from "../../models/AnswerFormDTO.ts";
 
 interface Props {

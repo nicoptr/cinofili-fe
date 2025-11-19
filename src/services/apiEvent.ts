@@ -1,5 +1,5 @@
 import {customFetch} from "./customFetch.ts";
-import type {EventDTO} from "../models/eventDTOs.ts";
+import type {EventDTO} from "../models/EventDTO.ts";
 
 export interface ApiEventParticipant {
     id: number;

@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {fetchEvent} from "../services/apiEvent.ts";
-import type {EventDTO, SubscriptionInEventDTO} from "../models/eventDTOs.ts";
+import type {EventDTO, SubscriptionInEventDTO} from "../models/EventDTO.ts";
 import {handleLogout} from "../services/utils.ts";
 import {getMe, type UserProfile} from "../services/auth.ts";
 import RatingModal from "../components/modals/subscription.rating.modal.tsx";
