@@ -1,3 +1,5 @@
+import type {AwardDTO} from "./AwardDTO.ts";
+
 export interface EventDTO {
     id: number;
     name: string;
@@ -22,16 +24,6 @@ export interface AwardInEventDTO {
     createdAt: string;
     updatedAt: string;
     award: AwardDTO;
-}
-
-export interface AwardDTO {
-    id: number;
-    name: string;
-    description: string;
-    questionId: number;
-    createdAt: string;
-    updatedAt: string;
-    question: AwardQuestionDTO;
 }
 
 export interface AwardQuestionDTO {

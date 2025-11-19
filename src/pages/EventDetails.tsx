@@ -5,8 +5,9 @@ import type {EventDTO, SubscriptionInEventDTO} from "../models/eventDTOs.ts";
 import {handleLogout} from "../services/utils.ts";
 import {getMe, type UserProfile} from "../services/auth.ts";
 import RatingModal from "../components/modals/subscription.rating.modal.tsx";
-import type {AnswerFormDTO} from "../models/AnswerFormDTO.ts";
-import {rateSubscription} from "../services/answer.ts";
+import type {AnswerDTO, AnswerFormDTO} from "../models/AnswerFormDTO.ts";
+import {fetchAnswers, rateSubscription} from "../services/answer.ts";
+import MyAnswersModal from "../components/modals/subscription.my-answers.modal.tsx";
 
 export default function EventDetails() {
     const {eventId} = useParams<{ eventId: string }>();
@@ -17,6 +18,11 @@ export default function EventDetails() {
     const [loggedUser, setLoggedUser] = useState<UserProfile | null>(null);
 
     const [event, setEvent] = useState<EventDTO>();
+    const [subsAnswers, setSubsAnswers] = useState<AnswerDTO[]>([]);
+
+    const [modalAnswers, setModalAnswers] = useState<AnswerDTO[]>([]);
+    const [isAnswersModalOpen, setIsAnswersModalOpen] = useState(false);
+
     const navigate = useNavigate();
 
 
@@ -32,6 +38,20 @@ export default function EventDetails() {
 
     }, [eventId]);
 
+    useEffect(() => {
+        if (!event) {
+            return;
+        }
+
+        event.subscriptions.forEach(subscription => {
+            fetchAnswers(subscription.id).then(res => {
+                setSubsAnswers(prevState => [...prevState, ...res]);
+            });
+        })
+
+
+    }, [event]);
+
     const handleSubmitRating = async (subId: number, dto: AnswerFormDTO) => {
         try {
             if (ratingSub) await rateSubscription(subId, dto);
@@ -45,8 +65,36 @@ export default function EventDetails() {
 
     };
 
-    const renderVoteButton = (sub: SubscriptionInEventDTO) => {
-        return sub.isReadyForRating && sub.ownerId !== loggedUser?.id;
+    const manageRightSideOfCard= (sub: SubscriptionInEventDTO) => {
+        if (!sub.isReadyForRating) {
+            return (
+                <span className="valid-text">⌛​ In attesa</span>
+            )
+        }
+        if (sub.ownerId === loggedUser?.id) {
+            return (
+                <span className="valid-text">🗿​ Tua candidatura</span>
+            )
+        }
+        if (subsAnswers.some(ans => ans.subscriptionId === sub.id)) {
+            return (
+                <button className="button" onClick={async () => {
+                    setModalAnswers(subsAnswers.filter(ans => ans.subscriptionId === sub.id));
+                    setIsAnswersModalOpen(true);
+                }}>
+                    Vedi voti
+                </button>
+            )
+        } else {
+            return (
+                <button className="button" onClick={async () => {
+                    setRatingSub(sub);
+                    setIsRatingModalOpen(true);
+                }}>
+                    Vota
+                </button>
+            )
+        }
     }
 
     return (
@@ -136,14 +184,9 @@ export default function EventDetails() {
                                                 </div>
                                             </div>
                                             <div className="sub-card-right">
-                                                {(renderVoteButton(sub)) &&
-                                                    <button className="button" onClick={async () => {
-                                                        setRatingSub(sub);
-                                                        setIsRatingModalOpen(true);
-                                                    }}>
-                                                        Vota
-                                                    </button>}
+                                                {manageRightSideOfCard(sub)}
                                             </div>
+
                                         </div>
                                     ) :
                                     (
@@ -169,6 +212,15 @@ export default function EventDetails() {
                 subId={ratingSub?.id ?? 0}
                 movieName={ratingSub?.movieName ?? ""}
                 onSubmit={handleSubmitRating}
+            />
+            <MyAnswersModal
+                isOpen={isAnswersModalOpen}
+                onClose={() => {
+                    setIsAnswersModalOpen(false);
+                    setModalAnswers([]);
+                }}
+                movieName={ratingSub?.movieName ?? ""}
+                answers={modalAnswers}
             />
         </>
     )
