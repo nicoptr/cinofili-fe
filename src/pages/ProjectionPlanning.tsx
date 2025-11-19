@@ -3,9 +3,15 @@ import {useNavigate, useParams} from "react-router-dom";
 import {fetchEvent} from "../services/apiEvent.ts";
 import type {EventDTO, SubscriptionInEventDTO} from "../models/eventDTOs.ts";
 import {handleLogout} from "../services/utils.ts";
-import {unlockNextSubscription, updateProjectionPlanning} from "../services/subscription.ts";
+import {
+    inviteParticipantsToFulfill,
+    unlockNextSubscription,
+    updateProjectionPlanning
+} from "../services/subscription.ts";
 import {DateTime} from "luxon";
 import PlanningModal from "../components/modals/subscription.planning.modal.tsx";
+import type {AnswerDTO} from "../models/AnswerFormDTO.ts";
+import {fetchAnswers} from "../services/answer.ts";
 
 export default function ProjectionPlanning() {
     const {eventId} = useParams<{ eventId: string }>();
@@ -13,9 +19,12 @@ export default function ProjectionPlanning() {
     const [isPlanningModalOpen, setIsPlanningModalOpen] = useState(false);
     const [editingSub, setEditingSub] = useState<SubscriptionInEventDTO | null>(null);
 
+    const [subsAnswers, setSubsAnswers] = useState<AnswerDTO[]>([]);
+
     const [event, setEvent] = useState<EventDTO>();
     const navigate = useNavigate();
 
+    const INVITE_TEXT = "Confermando invierai una mail ai partecipanti richiedendo la votazione della candidatura selezionata.\nVuoi continuare?";
 
     useEffect(() => {
         if (!eventId) {
@@ -25,6 +34,18 @@ export default function ProjectionPlanning() {
             setEvent(e);
         });
     }, [eventId]);
+
+    useEffect(() => {
+        if (!event) {
+            return;
+        }
+
+        event.subscriptions.forEach(subscription => {
+            fetchAnswers(subscription.id).then(res => {
+                setSubsAnswers(prevState => [...prevState, ...res]);
+            });
+        })
+    }, [event]);
 
     const handleSubmitPlanning = async (projectAt: string, location: string) => {
         try {
@@ -37,6 +58,39 @@ export default function ProjectionPlanning() {
             alert("Errore: " + err.message);
         }
     };
+
+    const renderRightSideOfCard = (sub: SubscriptionInEventDTO) => {
+        if (!sub.projectAt || (DateTime.fromISO(sub.projectAt ?? "") > DateTime.local())) {
+            return (
+                <button className="button" onClick={async () => {
+                    setEditingSub(sub);
+                    setIsPlanningModalOpen(true);
+                    }}>
+                    Programma
+                </button>
+            )
+        } else {
+            const voted = new Set(subsAnswers.map((ans) => ans.userId)).size;
+            const voters = event?.numberOfParticipants;
+            const renderButton = voters !== voted;
+            const classNameToUse = voted === 0 ? "info-text-error" : (voted === voters ? "info-text-valid" : "info-text-warning");
+
+            return (
+                <div>
+                    <span className={classNameToUse}>{`votati: ${voted}/${voters}`}</span>
+                    {
+                        renderButton &&
+                        <button className="button" onClick={async () => {
+                            if (!confirm(`${INVITE_TEXT}?`)) return;
+                            await inviteParticipantsToFulfill(sub.id);
+                        }}>
+                            Invita a votare
+                        </button>
+                    }
+                </div>
+            )
+        }
+    }
 
     return (
         <>
@@ -141,22 +195,7 @@ export default function ProjectionPlanning() {
                                                 </div>
                                             </div>
                                             <div className="sub-card-right">
-                                                {(!sub.projectAt || (DateTime.fromISO(sub.projectAt ?? "") > DateTime.local())) &&
-                                                    <button className="button" onClick={async () => {
-                                                        setEditingSub(sub);
-                                                        setIsPlanningModalOpen(true);
-                                                    }}>
-                                                        Programma
-                                                    </button>}
-                                                {/*<button className="button" onClick={async () => {*/}
-                                                {/*    try {*/}
-                                                {/*        console.log("")*/}
-                                                {/*    } catch (err: any) {*/}
-                                                {/*        alert("Errore durante la programmazione: " + err.message);*/}
-                                                {/*    }*/}
-                                                {/*}}>*/}
-                                                {/*    Avvia recensioni*/}
-                                                {/*</button>*/}
+                                                {renderRightSideOfCard(sub)}
                                             </div>
                                         </div>
                                     ) :

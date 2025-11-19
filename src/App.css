@@ -20,6 +20,33 @@
     margin-right: 0.5rem;
 }
 
+.info-text-warning {
+    color: #daa520;
+    padding: 0.5rem 1rem;
+    border: solid 1px #daa520;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.info-text-error {
+    color: #da2026;
+    padding: 0.5rem 1rem;
+    border: solid 1px #da2026;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.info-text-valid {
+    color: #2f4e4e;
+    padding: 0.5rem 1rem;
+    border: solid 1px #2f4e4e;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
 /* Pulsanti posizionati in alto a sinistra o a destra */
 .button-absolute {
     position: absolute;

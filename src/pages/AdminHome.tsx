@@ -183,7 +183,7 @@ export default function AdminHome() {
                                             </button>
                                         )
                                     }
-                                    <button
+                                    { (DateTime.fromISO(event.subscriptionExpiresAt) > DateTime.local()) && <button
                                         className="button"
                                         onClick={() => {
                                             setEditingEvent(event);
@@ -191,8 +191,8 @@ export default function AdminHome() {
                                         }}
                                     >
                                         Modifica
-                                    </button>
-                                    <button
+                                    </button>}
+                                    { (DateTime.fromISO(event.subscriptionExpiresAt) > DateTime.local()) && <button
                                         className="button"
                                         onClick={async () => {
                                             if (!confirm(`Eliminare '${event.name}'?`)) return;
@@ -202,7 +202,7 @@ export default function AdminHome() {
                                         }}
                                     >
                                         Elimina
-                                    </button>
+                                    </button>}
                                 </div>
 
                                 <button

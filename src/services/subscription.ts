@@ -93,3 +93,14 @@ export async function unlockNextSubscription(eventId: number): Promise<boolean> 
         method: "GET",
     })
 }
+
+export async function inviteParticipantsToFulfill(subId: number): Promise<void> {
+    return customFetch<void>(
+        true,
+        `/subscriptions/invite/rating/${subId}`,
+        {
+            method: "POST",
+            body: JSON.stringify({})
+        }
+    );
+}

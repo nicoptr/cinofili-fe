@@ -48,8 +48,6 @@ export default function EventDetails() {
                 setSubsAnswers(prevState => [...prevState, ...res]);
             });
         })
-
-
     }, [event]);
 
     const handleSubmitRating = async (subId: number, dto: AnswerFormDTO) => {
@@ -68,12 +66,12 @@ export default function EventDetails() {
     const manageRightSideOfCard= (sub: SubscriptionInEventDTO) => {
         if (!sub.isReadyForRating) {
             return (
-                <span className="valid-text">⌛​ In attesa</span>
+                <span className="info-text-warning">⌛​ In attesa</span>
             )
         }
         if (sub.ownerId === loggedUser?.id) {
             return (
-                <span className="valid-text">🗿​ Tua candidatura</span>
+                <span className="info-text-valid">🗿​ Tua candidatura</span>
             )
         }
         if (subsAnswers.some(ans => ans.subscriptionId === sub.id)) {
