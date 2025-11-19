@@ -1,4 +1,4 @@
-import type {AwardDTO} from "./EventDTO.ts";
+import type {AwardDTO} from "./AwardDTO.ts";
 
 export interface QuestionDTO {
     id: number;
