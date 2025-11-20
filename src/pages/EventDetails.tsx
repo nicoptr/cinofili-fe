@@ -142,7 +142,7 @@ export default function EventDetails() {
 
                             <div className="card-progress-bar">
                                 <div className="bar"
-                                     style={{width: `${Math.min(((event?.subscriptions.filter(s => s.isReadyForProjection).length ?? 0) / (event?.subscriptions.length ?? 1)) * 100, 100)}%`}}/>
+                                     style={{width: `${Math.min(((event?.subscriptions.filter(s => s.isReadyForProjection).length ?? 0) / (event?.numberOfParticipants ?? 1)) * 100, 100)}%`}}/>
                             </div>
                             <p>
                                 {event?.subscriptions.filter(s => s.isReadyForProjection).length}/{event?.numberOfParticipants} film svelati
