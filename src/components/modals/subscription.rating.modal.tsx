@@ -14,7 +14,7 @@ interface Props {
 
 const CONFIRM_TEXT = "Sei sicuro di voler inviare questa recensione? \n" +
     "Una volta inviata non potrai più modificarla.\n" +
-    "Pensaci bene, altrimenti chi ci lavora è costretto ad accedere al DB e fare cose brutte che gli faranno vedere un sacco di roba che rovinerebbero l'esperienza di gioco.\n" +
+    "Pensaci bene, altrimenti chi ci lavora è costretto ad accedere al DB e fare cose brutte che gli faranno vedere un sacco di roba che rovinerebbe l'esperienza di gioco.\n" +
     "Pinz, i pinz bunn!"
 
 
