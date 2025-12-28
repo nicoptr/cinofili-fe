@@ -70,7 +70,7 @@ export default function ProjectionPlanning() {
                 </button>
             )
         } else {
-            const voted = new Set(subsAnswers.map((ans) => ans.userId)).size;
+            const voted = new Set(subsAnswers.filter(ans => ans.subscriptionId === sub.id).map((ans) => ans.userId)).size;
             const voters = (event?.numberOfParticipants || 1) - 1;
             const renderButton = voters !== voted;
             const classNameToUse = voted === 0 ? "info-text-error" : (voted === voters ? "info-text-valid" : "info-text-warning");
